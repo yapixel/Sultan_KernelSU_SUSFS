@@ -5,7 +5,7 @@ permissions:
   actions: write   # Allows triggering actions
   
 on:
-  #push:
+  push:
   workflow_dispatch:
     inputs:
       make_release:
@@ -13,9 +13,15 @@ on:
         required: true
         type: boolean
         default: false
+      build_zuma:
+        description: 'Do you want to build the Zuma kernel?'
+        required: true
+        type: boolean
+        default: true
 
 jobs:
   build-kernel-a15-zuma:
+    if: ${{ inputs.build_zuma }}
     uses: ./.github/workflows/build-kernel-a15-zuma.yml
     secrets: inherit
 
@@ -23,10 +29,10 @@ jobs:
     runs-on: ubuntu-latest
     needs:
         - build-kernel-a15-zuma
-    if: ${{ github.event.inputs.make_release == 'true' }}
+    if: ${{ inputs.make_release }}
     env:
       REPO_OWNER: TheWildJames
-      REPO_NAME: android_kernel_google_zuma
+      REPO_NAME: Sultan_KernelSU_SUSFS
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RELEASE_NAME: "*TEST BUILD* Sultan Kernel With KernelSU Next & SUSFS v1.5.3 *TEST BUILD*"
       RELEASE_NOTES: |
