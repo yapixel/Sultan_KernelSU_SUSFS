@@ -32,10 +32,6 @@ jobs:
           
           echo "CONFIG set to: $CONFIG"
 
-      - name: Checkout the repository
-        uses: actions/checkout@v3
-        with:
-          path: android_kernel_google_zuma
       - name: Clone AnyKernel3 and Other Dependencies
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
@@ -52,6 +48,7 @@ jobs:
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
+          git clone https://github.com/kerneltoast/android_kernel_google_zuma
       
       - name: Add KernelSU
         run: |
