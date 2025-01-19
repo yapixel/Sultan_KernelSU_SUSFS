@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
         - build-kernel-a15-zuma
-        - build-kernel-a15-pro
+        - build-kernel-a15-zumapro
     if: ${{ inputs.make_release }}
     env:
       REPO_OWNER: TheWildJames
