@@ -25,11 +25,11 @@ on:
 
 jobs:
   build-kernel-a15-zuma:
-    if: ${{ github.event.inputs.build_zuma || github.event.inputs.build_zuma == '' }}
+    if: ${{ inputs.build_zuma }}
     uses: ./.github/workflows/build-kernel-a15-zuma.yml
     secrets: inherit
   build-kernel-a15-zumapro:
-    if: ${{ github.event.inputs.build_zumapro || github.event.inputs.build_zumapro == '' }}
+    if: ${{ inputs.build_zumapro }}
     uses: ./.github/workflows/build-kernel-a15-zumapro.yml
     secrets: inherit
 
