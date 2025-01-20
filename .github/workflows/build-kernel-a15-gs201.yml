@@ -25,7 +25,7 @@ jobs:
 
       - name: Set CONFIG Environment Variable
         run: |
-          CONFIG="android_kernel_google_zuma"
+          CONFIG="android_kernel_google_gs201"
           
           # Set CONFIG as an environment variable for future steps
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
@@ -37,8 +37,8 @@ jobs:
           echo "Cloning AnyKernel3 and other dependencies..."
     
           # Define the branch names using the matrix values
-          ANYKERNEL_BRANCH="15.0.0-sultan-zuma"
-          SUSFS_BRANCH="gki-android14-5.15"
+          ANYKERNEL_BRANCH="15.0.0-sultan-gs201"
+          SUSFS_BRANCH="gki-android13-5.10"
 
           # Debug print the branches
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
@@ -48,7 +48,7 @@ jobs:
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
-          git clone https://github.com/kerneltoast/android_kernel_google_zuma
+          git clone https://github.com/kerneltoast/android_kernel_google_gs201
       
       - name: Add KernelSU
         run: |
@@ -67,7 +67,7 @@ jobs:
           
           # Copy SUSFS patches
           cp ../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./KernelSU-Next/
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-5.15.patch ./
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
@@ -78,7 +78,7 @@ jobs:
           
           # Change to common directory and apply SUSFS patch
           cd ..
-          patch -p1 < 50_add_susfs_in_gki-android14-5.15.patch || true
+          patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch || true
           
       - name: Apply Next-SUSFS Patches
         run: |
@@ -132,29 +132,29 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           
-          echo "Adding configuration settings to zuma_defconfig..."
+          echo "Adding configuration settings to gs201_defconfig..."
           
           # Add SUSFS configuration settings
-          echo "CONFIG_KSU=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./arch/arm64/configs/zuma_defconfig
+          echo "CONFIG_KSU=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./arch/arm64/configs/gs201_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./arch/arm64/configs/gs201_defconfig
           
           # Add additional tmpfs config setting
-          echo "CONFIG_TMPFS_XATTR=y" >> ./arch/arm64/configs/zuma_defconfig
+          echo "CONFIG_TMPFS_XATTR=y" >> ./arch/arm64/configs/gs201_defconfig
 
       - name: Run sed and perl Commands
         run: |
@@ -162,7 +162,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Running sed commands..."
-          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Sultan-Wild+"/' ./arch/arm64/configs/zuma_defconfig
+          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Sultan-Wild+"/' ./arch/arm64/configs/gs201_defconfig
 
       - name: Build the Kernel
         run: |
@@ -170,7 +170,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Building the kernel..."
-          make zuma_defconfig -j$(nproc --all)
+          make gs201_defconfig -j$(nproc --all)
           make -j$(nproc --all)
 
       - name: Copy Images
@@ -180,7 +180,8 @@ jobs:
 
           echo "Copying Image.lz4 and concatenating DTB files..."
           cp ./out/arch/arm64/boot/Image.lz4 ../AnyKernel3/Image.lz4
-          cat ./out/google-modules/soc/gs/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
+          cat ./out/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
+          cp ./out/arch/arm64/boot/dts/google/dtbo.img ../AnyKernel3/dtbo.img
 
       - name: Create ZIP Files for Different Formats
         run: |
@@ -188,13 +189,13 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="A15_Sultan_KernelSU_SUSFS_Zuma.zip"
+          ZIP_NAME="A15_Sultan_KernelSU_SUSFS_GS201.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
           
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-zuma
+          name: kernel-gs201
           path: |
             *.zip
