@@ -1,10 +1,10 @@
-name: Build A15 Zuma Kernel
+name: Build A15 GS201 Kernel
 
 on:
   workflow_call:  # This allows this workflow to be called from another workflow
   
 jobs:
-  build-kernel-a15-zuma-kernelsu-susfs:
+  build-kernel-a15-gs201-kernelsu-susfs:
     runs-on: ubuntu-latest
 
     steps:
