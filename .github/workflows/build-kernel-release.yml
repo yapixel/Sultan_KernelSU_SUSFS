@@ -47,7 +47,7 @@ jobs:
     needs:
         - build-kernel-a15-gs201
         - build-kernel-a15-zuma
-        - build-kernel-a15-zumapro
+      #  - build-kernel-a15-zumapro
     if: ${{ inputs.make_release }}
     env:
       REPO_OWNER: TheWildJames
