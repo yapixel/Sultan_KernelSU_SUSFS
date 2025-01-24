@@ -31,7 +31,7 @@ on:
 jobs:
   build-kernel-a15-gs201:
     if: ${{ inputs.build_gs201 }}
-    uses: ./.github/workflows/build-kernel-a15-zuma.yml
+    uses: ./.github/workflows/build-kernel-a15-gs201.yml
     secrets: inherit
   build-kernel-a15-zuma:
     if: ${{ inputs.build_zuma }}
