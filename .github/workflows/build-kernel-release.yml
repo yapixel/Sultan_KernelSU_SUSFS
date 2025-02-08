@@ -17,11 +17,6 @@ on:
         required: true
         type: boolean
         default: true
-      build_zumapro:
-        description: 'Do you want to build the Zuma Pro kernel?'
-        required: true
-        type: boolean
-        default: true
       make_release:
         description: 'Do you want to create a release?'
         required: true
@@ -37,17 +32,12 @@ jobs:
     if: ${{ inputs.build_zuma }}
     uses: ./.github/workflows/build-kernel-a15-zuma.yml
     secrets: inherit
-  build-kernel-a15-zumapro:
-    if: ${{ inputs.build_zumapro }}
-    uses: ./.github/workflows/build-kernel-a15-zumapro.yml
-    secrets: inherit
 
   trigger-release:
     runs-on: ubuntu-latest
     needs:
         - build-kernel-a15-gs201
         - build-kernel-a15-zuma
-      #  - build-kernel-a15-zumapro
     if: ${{ inputs.make_release }}
     env:
       REPO_OWNER: TheWildJames
@@ -71,16 +61,6 @@ jobs:
         [+] Futile Maphide for jit-zygote-cache Detections
         [+] Magic Mount Support
 
-        Special thanks to the following people for their contributions!
-        This helps me alot! <3
-
-        sultan - Created Kernel!
-        simonpunk - Created SUSFS!
-        sidex15 - Created module!
-        backslashxx - Helped with patches!
-        幕落 - Donation!
-
-        If you have contributed and are not here please remind me!
     steps:
       # Checkout the code
       - name: Checkout code
@@ -92,11 +72,11 @@ jobs:
             # Fetch the latest tag from GitHub (this is the latest tag based on the GitHub API)
             LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
             if [ -z "$LATEST_TAG" ]; then
-              LATEST_TAG="v1.5.3-0"  # Default to v1.5.3-0 if no tag exists
+              LATEST_TAG="v1.5.5-r0"  # Default to v1.5.3-0 if no tag exists
             fi
 
             # Increment the suffix (e.g., v1.5.3-0 becomes v1.5.3-1)
-            NEW_TAG=$(echo "$LATEST_TAG" | awk -F- '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-%d", $1, suffix}')
+            NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
     
             # Output the new tag to be used
             echo "New tag: $NEW_TAG"
