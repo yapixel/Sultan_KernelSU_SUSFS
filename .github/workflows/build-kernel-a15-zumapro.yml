@@ -1,10 +1,10 @@
-name: Build A15 Zuma Kernel
+name: Build A15 Zuma Pro Kernel
 
 on:
   workflow_call:  # This allows this workflow to be called from another workflow
   
 jobs:
-  build-kernel-a15-zuma-kernelsu-susfs:
+  build-kernel-a15-zumapro-kernelsu-susfs:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
 
       - name: Set CONFIG Environment Variable
         run: |
-          CONFIG="android_kernel_google_zuma"
+          CONFIG="android_kernel_google_zumapro"
           
           # Set CONFIG as an environment variable for future steps
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
@@ -37,8 +37,8 @@ jobs:
           echo "Cloning AnyKernel3 and other dependencies..."
     
           # Define the branch names using the matrix values
-          ANYKERNEL_BRANCH="15.0.0-sultan-zuma"
-          SUSFS_BRANCH="gki-android14-5.15"
+          ANYKERNEL_BRANCH="15.0.0-sultan-zumapro"
+          SUSFS_BRANCH="gki-android14-6.1"
 
           # Debug print the branches
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
@@ -48,7 +48,7 @@ jobs:
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
-          git clone https://github.com/kerneltoast/android_kernel_google_zuma
+          git clone https://github.com/kerneltoast/android_kernel_google_zumapro
       
       - name: Add KernelSU
         run: |
@@ -67,7 +67,7 @@ jobs:
           
           # Copy SUSFS patches
           cp ../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./KernelSU-Next/
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-5.15.patch ./
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
@@ -79,7 +79,7 @@ jobs:
           
           # Change to common directory and apply SUSFS patch
           cd ..
-          patch -p1 < 50_add_susfs_in_gki-android14-5.15.patch || true
+          patch -p1 < 50_add_susfs_in_gki-android14-6.1.patch || true
 
       - name: Apply KSU Hooks
         run: |
@@ -143,6 +143,7 @@ jobs:
           
           # Add additional tmpfs config setting
           echo "CONFIG_TMPFS_XATTR=y" >> ./arch/arm64/configs/zuma_defconfig
+          echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./common/arch/arm64/configs/gki_defconfig
 
       - name: Run sed and perl Commands
         run: |
