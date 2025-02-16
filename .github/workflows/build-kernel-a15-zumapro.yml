@@ -1,6 +1,7 @@
 name: Build A15 Zuma Pro Kernel
 
 on:
+  workflow_dispatch:
   workflow_call:  # This allows this workflow to be called from another workflow
   
 jobs:
@@ -177,7 +178,7 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="A15_Sultan_KernelSU_SUSFS_Zuma.zip"
+          ZIP_NAME="A15_Sultan_KernelSU_SUSFS_ZumaPro.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
           
