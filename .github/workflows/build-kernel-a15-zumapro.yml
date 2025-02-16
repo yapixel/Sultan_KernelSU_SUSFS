@@ -33,18 +33,6 @@ jobs:
           
           echo "CONFIG set to: $CONFIG"
 
-      - name: Download and Extract GCC 14.2
-        run: |
-          # Replace with the actual URL of the GCC 14.2 prebuilt for aarch64-linux-gnu
-          GCC_URL="https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz"  # <-- **IMPORTANT:  REPLACE THIS URL**
-          GCC_FILENAME="gcc-14.2.0.tar.xz"
-          GCC_EXTRACT_DIR="gcc-14.2"
-          wget "$GCC_URL" -O "$GCC_FILENAME"
-          mkdir "$GCC_EXTRACT_DIR"
-          tar -xf "$GCC_FILENAME" -C "$GCC_EXTRACT_DIR"
-          echo "GCC_PATH=$(pwd)/$GCC_EXTRACT_DIR/bin" >> $GITHUB_ENV
-          echo "GCC_TOOLCHAIN=$(pwd)/$GCC_EXTRACT_DIR" >> $GITHUB_ENV # Store for possible later usage
-
       - name: Clone AnyKernel3 and Other Dependencies
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
@@ -101,6 +89,8 @@ jobs:
           # Apply additional patch
           cp ../kernel_patches/ksu_hooks_zumapro.patch ./
           patch -p1 --fuzz=3 < ./ksu_hooks_zumapro.patch
+          cp ../kernel_patches/ksu_input_hook_fix.patch ./
+          patch -p1 --fuzz=3 < ./ksu_input_hook_fix.patch
 
       - name: Apply Hide Stuff Patches
         run: |
