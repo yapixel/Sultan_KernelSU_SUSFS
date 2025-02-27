@@ -7,16 +7,6 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      build_gs201:
-        description: 'Do you want to build the GS201 kernel?'
-        required: true
-        type: boolean
-        default: true
-      build_zuma:
-        description: 'Do you want to build the Zuma kernel?'
-        required: true
-        type: boolean
-        default: true
       make_release:
         description: 'Do you want to create a release?'
         required: true
@@ -25,12 +15,13 @@ on:
 
 jobs:
   build-kernel-a15-gs201:
-    if: ${{ inputs.build_gs201 }}
     uses: ./.github/workflows/build-kernel-a15-gs201.yml
     secrets: inherit
   build-kernel-a15-zuma:
-    if: ${{ inputs.build_zuma }}
     uses: ./.github/workflows/build-kernel-a15-zuma.yml
+    secrets: inherit
+  build-kernel-a15-zumapro:
+    uses: ./.github/workflows/build-kernel-a15-zumapro.yml
     secrets: inherit
 
   trigger-release:
@@ -38,6 +29,7 @@ jobs:
     needs:
         - build-kernel-a15-gs201
         - build-kernel-a15-zuma
+        - build-kernel-a15-zumapro
     if: ${{ inputs.make_release }}
     env:
       REPO_OWNER: TheWildJames
