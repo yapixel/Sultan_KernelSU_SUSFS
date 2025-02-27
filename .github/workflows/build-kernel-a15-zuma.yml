@@ -96,16 +96,16 @@ jobs:
           # Apply additional patch
           cp ../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch
+
+      - name: Apply KernelSU & SUSFS SUltan Fixes
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          # Apply additional patch
+          cp ../kernel_patches/sys.c_fix.patch ./
+          patch -p1 --fuzz=3 < ./sys.c_fix.patch
           sed -i "s/poofed_size: '%u'/poofed_size: '%llu'/g" ./fs/susfs.c
           sed -i "s/length of string: %u/length of string: %lu/g" ./fs/susfs.c
-
-      #- name: Apply KernelSU & SUSFS SUltan Fixes
-      #  run: |
-      #    echo "Changing to configuration directory: $CONFIG..."
-      #    cd "$CONFIG"
-      #    # Apply additional patch
-      #    cp ../kernel_patches/sys.c_fix.patch ./
-      #    patch -p1 --fuzz=3 < ./sys.c_fix.patch
 
       #    cp ../kernel_patches/mount.h_fix.patch ./
       #    patch -p1 --fuzz=3 < ./mount.h_fix.patch
