@@ -1,6 +1,7 @@
 name: Build A15 Zuma Kernel
 
 on:
+  workflow_dispatch:
   workflow_call:  # This allows this workflow to be called from another workflow
   
 jobs:
