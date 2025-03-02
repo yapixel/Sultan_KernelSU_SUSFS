@@ -1,4 +1,4 @@
-name: Build and Release GKI Kernels
+name: Build and Release Sultan Kernels
 
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
