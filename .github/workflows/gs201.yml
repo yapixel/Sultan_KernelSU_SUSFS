@@ -1,0 +1,17 @@
+name: GS201
+permissions:
+  contents: write  # Allow writing to repository contents (for pushing tags)
+  actions: write   # Allows triggering actions
+
+on:
+  workflow_call:  # This allows this workflow to be called from another workflow
+  
+jobs:
+  build-kernel-sultan-kernelsu-susfs:
+    uses: ./.github/workflows/sultan.yml
+    secrets: inherit
+    with:
+      codename: "gs201"
+      repo: "android_kernel_google_gs201"
+      android_version: "android13"
+      kernel_version: "5.10"
