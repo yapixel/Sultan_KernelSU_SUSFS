@@ -11,6 +11,7 @@ jobs:
     uses: ./.github/workflows/sultan.yml
     secrets: inherit
     with:
+      codename: "zuma"
       repo: "android_kernel_google_zuma"
       android_version: "android14"
       kernel_version: "5.15"
