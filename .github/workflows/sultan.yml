@@ -186,7 +186,7 @@ jobs:
           if [ "${{ inputs.codename }}" == "gs201" ]; then
             cat ./out/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
             cp ./out/arch/arm64/boot/dts/google/dtbo.img ../AnyKernel3/dtbo.img
-          else
+          elif [ "${{ inputs.codename }}" == "zuma" ]; then
             cat ./out/google-modules/soc/gs/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
           fi
 
