@@ -15,13 +15,13 @@ on:
 
 jobs:
   build-kernel-a15-gs201:
-    uses: ./.github/workflows/build-kernel-a15-gs201.yml
+    uses: ./.github/workflows/gs201.yml
     secrets: inherit
   build-kernel-a15-zuma:
-    uses: ./.github/workflows/build-kernel-a15-zuma.yml
+    uses: ./.github/workflows/zuma.yml
     secrets: inherit
   build-kernel-a15-zumapro:
-    uses: ./.github/workflows/build-kernel-a15-zumapro.yml
+    uses: ./.github/workflows/zumapro.yml
     secrets: inherit
 
   trigger-release:
@@ -43,7 +43,7 @@ jobs:
         -> https://github.com/sidex15/ksu_module_susfs
         
         Non-Official Managers:
-        -> https://github.com/rifsxd/KernelSU-Next
+        -> https://github.com/KernelSU-Next/KernelSU-Next
         
         Features:
         [+] KernelSU-Next
