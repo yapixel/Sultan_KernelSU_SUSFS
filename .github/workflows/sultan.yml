@@ -169,6 +169,9 @@ jobs:
           cd "$CONFIG"
           
           echo "Building the kernel..."
+          if [ "${{ inputs.codename }}" == "zumapro" ]; then
+            export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
+          fi
           make ${{ inputs.codename }}_defconfig -j$(nproc --all)
           make -j$(nproc --all)
 
@@ -183,7 +186,7 @@ jobs:
           if [ "${{ inputs.codename }}" == "gs201" ]; then
             cat ./out/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
             cp ./out/arch/arm64/boot/dts/google/dtbo.img ../AnyKernel3/dtbo.img
-          elif [ "${{ inputs.codename }}" == "zuma" ]; then
+          else
             cat ./out/google-modules/soc/gs/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
           fi
 
