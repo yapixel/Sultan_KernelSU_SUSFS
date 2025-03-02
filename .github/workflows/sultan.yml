@@ -37,6 +37,7 @@ jobs:
 
       - name: Installing dependencies
         run: |
+          sudo apt update
           sudo apt install -y gcc-aarch64-linux-gnu
 
       - name: Set CONFIG Environment Variable
