@@ -190,6 +190,13 @@ jobs:
             cat ./out/google-modules/soc/gs/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
           fi
 
+      - name: Upload Config Artifact
+        if: ${{ inputs.codename == 'zumapro' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.CONFIG }}
+          path: ${{ env.CONFIG }}
+
       - name: Create ZIP Files for Different Formats
         run: |
           echo "Navigating to AnyKernel3 directory..."
