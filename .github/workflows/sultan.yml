@@ -188,14 +188,9 @@ jobs:
             cp ./out/arch/arm64/boot/dts/google/dtbo.img ../AnyKernel3/dtbo.img
           elif [ "${{ inputs.codename }}" == "zuma" ]; then
             cat ./out/google-modules/soc/gs/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
+          elif [ "${{ inputs.codename }}" == "zumapro" ]; then
+            cat ./out/google-devices/zumapro/dts/*.dtb > ../AnyKernel3/dtb
           fi
-
-      - name: Upload Config Artifact
-        if: ${{ inputs.codename == 'zumapro' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.CONFIG }}
-          path: ${{ env.CONFIG }}
 
       - name: Create ZIP Files for Different Formats
         run: |
@@ -203,7 +198,7 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="A15_Sultan_KernelSU_SUSFS_${{ inputs.codename }}.zip"
+          ZIP_NAME="${{ inputs.codename }}_A15_Sultan_Next_SUSFS.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
           
