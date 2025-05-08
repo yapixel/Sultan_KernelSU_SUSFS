@@ -20,8 +20,8 @@ jobs:
     with:
       codename: "gs201"
       repo: "android_kernel_google_gs201"
-      android_version: "android13"
-      kernel_version: "5.10"
+      android_version: "android14"
+      kernel_version: "6.1"
       
   build-kernel-zuma:
     uses: ./.github/workflows/sultan.yml
@@ -30,7 +30,7 @@ jobs:
       codename: "zuma"
       repo: "android_kernel_google_zuma"
       android_version: "android14"
-      kernel_version: "5.15"
+      kernel_version: "6.1"
 
   build-kernel-zumapro:
     uses: ./.github/workflows/sultan.yml
@@ -52,9 +52,9 @@ jobs:
       REPO_OWNER: TheWildJames
       REPO_NAME: Sultan_KernelSU_SUSFS
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU Next & SUSFS v1.5.5 *TEST BUILD*"
+      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU Next & SUSFS v1.5.7 *TEST BUILD*"
       RELEASE_NOTES: |
-        This release contains KernelSU Next and SUSFS v1.5.5
+        This release contains KernelSU Next and SUSFS v1.5.7
         
         Module: 
         -> https://github.com/sidex15/ksu_module_susfs
@@ -64,7 +64,7 @@ jobs:
         
         Features:
         [+] KernelSU-Next
-        [+] SUSFS v1.5.5
+        [+] SUSFS v1.5.7
         [+] Wireguard Support
         [+] Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
