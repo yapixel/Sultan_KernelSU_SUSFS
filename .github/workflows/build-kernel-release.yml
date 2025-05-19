@@ -21,7 +21,7 @@ jobs:
       codename: "gs201"
       repo: "android_kernel_google_gs201"
       android_version: "android13"
-      kernel_version: "5.15"
+      kernel_version: "5.10"
       
   build-kernel-zuma:
     uses: ./.github/workflows/sultan.yml
