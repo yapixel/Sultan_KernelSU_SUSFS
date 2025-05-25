@@ -109,6 +109,8 @@ jobs:
           # Change to common directory and apply SUSFS patch
           cd ..
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          cp ../kernel_patches/sultan/sys.c_fix.patch ./
+          patch -p1 --fuzz=3 < sys.c_fix.patch
 
       - name: Apply KSU Hooks
         run: |
@@ -126,19 +128,17 @@ jobs:
           cp ../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch
 
-      - name: Apply KernelSU & SUSFS Sultan Fixes
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          # Apply additional patch
-          cp ../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 --fuzz=3 < sys.c_fix.patch
-          #sed -i "s/poofed_size: '%u'/poofed_size: '%llu'/g" ./fs/susfs.c
-          #sed -i "s/length of string: %u/length of string: %lu/g" ./fs/susfs.c
-          sed -i '1i\
-          #ifndef FUSE_SUPER_MAGIC\n\
-          #define FUSE_SUPER_MAGIC 0x65735546\n\
-          #endif\n' ./include/linux/susfs_def.h
+      #- name: Apply KernelSU & SUSFS Sultan Fixes
+      #  run: |
+      #    echo "Changing to configuration directory: $CONFIG..."
+      #    cd "$CONFIG"
+      #    # Apply additional patch
+      #    #sed -i "s/poofed_size: '%u'/poofed_size: '%llu'/g" ./fs/susfs.c
+      #    #sed -i "s/length of string: %u/length of string: %lu/g" ./fs/susfs.c
+      #    sed -i '1i\
+      #    #ifndef FUSE_SUPER_MAGIC\n\
+      #    #define FUSE_SUPER_MAGIC 0x65735546\n\
+      #    #endif\n' ./include/linux/susfs_def.h
 
       - name: Add SUSFS Configuration Settings
         run: |
