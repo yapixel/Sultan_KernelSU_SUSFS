@@ -124,7 +124,7 @@ jobs:
           cd "$CONFIG"
           # Apply additional patch
           cp ../kernel_patches/sultan/scope_min_manual_hooks_v1.4.patch ./
-          patch -p1 -F 3 < scope_min_manual_hooks_v1.4.patch
+          patch -p1 -F 3 < syscall_hooks.patch
           
       - name: Apply Hide Stuff Patches
         run: |
