@@ -221,8 +221,8 @@ jobs:
           cp ./out/arch/arm64/boot/Image.lz4 ../AnyKernel3/Image.lz4
 
           if [ "${{ inputs.codename }}" == "gs201" ]; then
-            cat ./out/arch/arm64/boot/dts/google/*.dtb > ../AnyKernel3/dtb
-            cp ./out/arch/arm64/boot/dts/google/dtbo.img ../AnyKernel3/dtbo.img
+            cat ./out/google-devices/gs201/dts/*.dtb > ../AnyKernel3/dtb
+            cp ./out/google-devices/gs201/dts/dtbo.img ../AnyKernel3/dtbo.img
           elif [ "${{ inputs.codename }}" == "zuma" ]; then
             cat ./out/google-devices/zuma/dts/*.dtb > ../AnyKernel3/dtb
           elif [ "${{ inputs.codename }}" == "zumapro" ]; then
