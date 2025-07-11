@@ -123,7 +123,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           # Apply additional patch
-          cp ../kernel_patches/sultan/scope_min_manual_hooks_v1.4.patch ./
+          cp ../kernel_patches/next/syscall_hooks.patch ./
           patch -p1 -F 3 < syscall_hooks.patch
           
       - name: Apply Hide Stuff Patches
