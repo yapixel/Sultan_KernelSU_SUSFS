@@ -111,6 +111,9 @@ jobs:
 
           cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_rules.c.patch ./
           patch -p1 --forward --fuzz=3 < fix_rules.c.patch
+
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_sucompat.c.patch ./
+          patch -p1 --forward --fuzz=3 < fix_sucompat.c.patch
           
           # Change to common directory and apply SUSFS patch
           cd ..
@@ -133,18 +136,6 @@ jobs:
           # Apply additional patch
           cp ../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch
-
-      #- name: Apply KernelSU & SUSFS Sultan Fixes
-      #  run: |
-      #    echo "Changing to configuration directory: $CONFIG..."
-      #    cd "$CONFIG"
-      #    # Apply additional patch
-      #    #sed -i "s/poofed_size: '%u'/poofed_size: '%llu'/g" ./fs/susfs.c
-      #    #sed -i "s/length of string: %u/length of string: %lu/g" ./fs/susfs.c
-      #    sed -i '1i\
-      #    #ifndef FUSE_SUPER_MAGIC\n\
-      #    #define FUSE_SUPER_MAGIC 0x65735546\n\
-      #    #endif\n' ./include/linux/susfs_def.h
 
       - name: Add SUSFS Configuration Settings
         run: |
@@ -198,7 +189,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Running sed commands..."
-          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Sultan-Wild"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Wild"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
       - name: Build the Kernel
         run: |
@@ -219,15 +210,7 @@ jobs:
 
           echo "Copying Image.lz4 and concatenating DTB files..."
           cp ./out/arch/arm64/boot/Image.lz4 ../AnyKernel3/Image.lz4
-
-          if [ "${{ inputs.codename }}" == "gs201" ]; then
-            cat ./out/google-devices/gs201/dts/*.dtb > ../AnyKernel3/dtb
-            #cp ./out/google-devices/gs201/dts/dtbo.img ../AnyKernel3/dtbo.img
-          elif [ "${{ inputs.codename }}" == "zuma" ]; then
-            cat ./out/google-devices/zuma/dts/*.dtb > ../AnyKernel3/dtb
-          elif [ "${{ inputs.codename }}" == "zumapro" ]; then
-            cat ./out/google-devices/zumapro/dts/*.dtb > ../AnyKernel3/dtb
-          fi
+          cat ./out/google-devices/${{ inputs.codename }}/dts/*.dtb > ../AnyKernel3/dtb
 
       - name: Create ZIP Files for Different Formats
         run: |
