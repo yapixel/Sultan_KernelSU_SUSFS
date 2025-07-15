@@ -65,7 +65,6 @@ jobs:
         Features:
         [+] KernelSU-Next
         [+] SUSFS v1.5.9
-        [+] Wireguard Support
         [+] Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
         [+] Magic Mount Support
