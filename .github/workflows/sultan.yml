@@ -64,9 +64,6 @@ jobs:
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          #cd susfs4ksu
-          #git checkout b5c3ada461a61c6ad033693b7a00494ead3a28fd
-          #cd ..
           git clone https://github.com/TheWildJames/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
       
@@ -76,7 +73,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s next
+          curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
 
       - name: Apply SUSFS Patches
         run: |
@@ -90,32 +87,23 @@ jobs:
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
-          cd ./KernelSU-Next
+          cd ./Wild_KSU
           
-          echo "Applying next SUSFS patches..."
+          echo "Applying wild SUSFS patches..."
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
           patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
 
-          echo "Applying next SUSFS Fix patches..."
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_apk_sign.c.patch ./
-          patch -p1 --forward < fix_apk_sign.c.patch
-              
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_core_hook.c.patch ./
+          echo "Applying wild SUSFS Fix patches..."
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_core_hook.c.patch ./
           patch -p1 --forward < fix_core_hook.c.patch
-          
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_selinux.c.patch ./
-          patch -p1 --forward < fix_selinux.c.patch
-            
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_ksud.c.patch ./
-          patch -p1 --forward < fix_ksud.c.patch
 
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_rules.c.patch ./
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_rules.c.patch ./
           patch -p1 --forward < fix_rules.c.patch
 
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_sucompat.c.patch ./
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_sucompat.c.patch ./
           patch -p1 --forward < fix_sucompat.c.patch
 
-          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.9/fix_kernel_compat.c.patch ./
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_kernel_compat.c.patch ./
           patch -p1 --forward < fix_kernel_compat.c.patch
           
           # Change to common directory and apply SUSFS patch
@@ -129,7 +117,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           # Apply additional patch
-          cp ../kernel_patches/next/syscall_hooks.patch ./
+          cp ../kernel_patches/wild/syscall_hooks.patch ./
           patch -p1 -F 3 < syscall_hooks.patch
           
       - name: Apply Hide Stuff Patches
@@ -228,7 +216,7 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="${{ inputs.codename }}_A16_Sultan_Next_SUSFS.zip"
+          ZIP_NAME="${{ inputs.codename }}_A16_Sultan_WKSU_SUSFS.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
           
