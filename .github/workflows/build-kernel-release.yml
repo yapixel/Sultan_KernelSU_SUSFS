@@ -59,11 +59,12 @@ jobs:
         Module: 
         -> https://github.com/sidex15/ksu_module_susfs
         
-        Non-Official Managers:
+        Managers:
+        -> https://github.com/WildKernels/Wild_KSU
         -> https://github.com/KernelSU-Next/KernelSU-Next
         
         Features:
-        [+] KernelSU-Next
+        [+] Wild KSU & KernelSU-Next Managers
         [+] SUSFS v1.5.9
         [+] Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
