@@ -117,7 +117,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           # Apply additional patch
-          cp ../kernel_patches/wild/syscall_hooks.patch ./
+          cp ../kernel_patches/wild/hooks/syscall_hooks.patch ./
           patch -p1 -F 3 < syscall_hooks.patch
           
       - name: Apply Hide Stuff Patches
