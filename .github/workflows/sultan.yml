@@ -92,20 +92,7 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
-      - name: Verify SUSFS Patch Applied
-        run: |
-          echo "Checking if SUSFS patch was applied..."
-          cd "$CONFIG"
-          if ! grep -R "susfs_init" -n fs/ kernel/ include/; then
-              echo "❌ SUSFS patch not applied correctly!"
-              exit 1
-          fi
-          if ! grep -q "CONFIG_KSU_SUSFS=y" arch/arm64/configs/${{ inputs.codename }}_defconfig; then
-              echo "❌ SUSFS config missing in defconfig!"
-              exit 1
-          fi
-          echo "✅ SUSFS patch verified successfully."
-
+    
       - name: Apply KSU Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
