@@ -34,7 +34,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU Next & SUSFS v1.5.9 *TEST BUILD*"
       RELEASE_NOTES: |
-        This release contains KernelSU Next and SUSFS v1.5.9
+        This release contains WildKSU and SUSFS v1.5.9
         
         Module: 
         -> https://github.com/sidex15/ksu_module_susfs
@@ -49,7 +49,7 @@ jobs:
         [+] Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
         [+] Magic Mount Support
-
+        [+] IPSet Support
     steps:
       # Checkout the code
       - name: Checkout code
