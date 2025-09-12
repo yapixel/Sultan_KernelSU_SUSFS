@@ -91,11 +91,6 @@ jobs:
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
           cd ./KernelSU-Next
-          
-          echo "Applying wild SUSFS patches..."
-          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 -F 3 < 10_enable_susfs_for_ksu.patch || true
-
           echo "Applying wild SUSFS Fix patches..."
           cp ../../kernel_patches/next/0001-SuSFS-1.5.9-v6.patch ../
           patch -p1 < 0001-SuSFS-1.5.9-v6.patch 
