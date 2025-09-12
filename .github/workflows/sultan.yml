@@ -93,14 +93,7 @@ jobs:
           echo "Applying KSU managers patch..."
           
           curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
-          if [ ! -f 0001-add-more-managers.patch ]; then
-          echo "Error: Failed to download KSU managers patch"
-          exit 1
-          fi
-          if [ ! -f kernel/apk_sign.c ]; then
-           echo "Error: kernel/apk_sign.c not found for patching"
-          exit 1
-          fi
+          
           patch -p1 < ../0001-add-more-managers.patch
 
           # Change to common directory and apply SUSFS patch
