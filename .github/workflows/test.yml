@@ -29,7 +29,7 @@ jobs:
       - build-kernel-zuma
     if: ${{ inputs.make_release }}
     env:
-      REPO_OWNER: TheWildJames
+      REPO_OWNER: yapixel
       REPO_NAME: Sultan_KernelSU_SUSFS
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU Next & SUSFS v1.5.9 *TEST BUILD*"
