@@ -66,7 +66,7 @@ jobs:
           git clone https://github.com/yapixel/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
-      
+
       - name: Add KernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -91,32 +91,36 @@ jobs:
           
           echo "Applying wild SUSFS patches..."
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
+          echo "Contents of core_hook.c before 10_enable_susfs_for_ksu.patch:"
+          head -n 1200 ../kernel/core_hook.c | tail -n 50
+          patch -p1 -F 3 < 10_enable_susfs_for_ksu.patch || { echo "Patch failed, see rejects:"; cat 10_enable_susfs_for_ksu.patch.rej; exit 1; }
+          echo "Contents of core_hook.c after 10_enable_susfs_for_ksu.patch:"
+          head -n 1200 ../kernel/core_hook.c | tail -n 50
 
           echo "Applying wild SUSFS Fix patches..."
           cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_core_hook.c.patch ./
-          patch -p1 --forward < fix_core_hook.c.patch || true
+          patch -p1 -F 3 < fix_core_hook.c.patch || { echo "Patch failed, see rejects:"; cat fix_core_hook.c.rej; exit 1; }
 
           cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_sucompat.c.patch ./
-          patch -p1 --forward < fix_sucompat.c.patch  || true
+          patch -p1 -F 3 < fix_sucompat.c.patch || { echo "Patch failed, see rejects:"; cat fix_sucompat.c.rej; exit 1; }
 
           cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_kernel_compat.c.patch ./
-          patch -p1 --forward < fix_kernel_compat.c.patch || true
+          patch -p1 -F 3 < fix_kernel_compat.c.patch || { echo "Patch failed, see rejects:"; cat fix_kernel_compat.c.rej; exit 1; }
           
           # Change to common directory and apply SUSFS patch
           cd ..
-          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || { echo "Patch failed, see rejects:"; cat 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch.rej; exit 1; }
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 --fuzz=3 < sys.c_fix.patch || true
+          patch -p1 -F 3 < sys.c_fix.patch || { echo "Patch failed, see rejects:"; cat sys.c_fix.patch.rej; exit 1; }
 
       - name: Upload Patch Reject Files
-        if: failure()  # Only run if previous steps failed
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-         name: patch-rejects-${{ inputs.codename }}
-         path: |
-           **/*.rej
-         retention-days: 5  # Keep artifacts for 5 days
+          name: patch-rejects-${{ inputs.codename }}
+          path: |
+            **/*.rej
+          retention-days: 5
 
       - name: Apply KSU Hooks
         run: |
@@ -124,15 +128,15 @@ jobs:
           cd "$CONFIG"
           # Apply additional patch
           cp ../kernel_patches/wild/hooks/syscall_hooks.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch
-          
+          patch -p1 -F 3 < syscall_hooks.patch || { echo "Patch failed, see rejects:"; cat syscall_hooks.patch.rej; exit 1; }
+
       - name: Apply Hide Stuff Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           # Apply additional patch
           cp ../kernel_patches/69_hide_stuff.patch ./
-          patch -p1 -F 3 < 69_hide_stuff.patch
+          patch -p1 -F 3 < 69_hide_stuff.patch || { echo "Patch failed, see rejects:"; cat 69_hide_stuff.patch.rej; exit 1; }
 
       - name: Add SUSFS Configuration Settings
         run: |
@@ -188,6 +192,14 @@ jobs:
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Sultan-Wild"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
+      - name: Check for KernelSU Functions
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          echo "Checking for ksu_handle_execve_ksud and ksu_handle_devpts..."
+          grep -r "ksu_handle_execve_ksud" . || echo "ksu_handle_execve_ksud not found"
+          grep -r "ksu_handle_devpts" . || echo "ksu_handle_devpts not found"
+
       - name: Build the Kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -197,8 +209,9 @@ jobs:
           if [ "${{ inputs.codename }}" == "zumapro" ]; then
             export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
           fi
+          export KBUILD_CFLAGS="${KCFLAGS} -fno-lto"  # Disable LTO to isolate issue
           make ${{ inputs.codename }}_defconfig -j$(nproc --all)
-          make -j$(nproc --all)
+          make -j$(nproc --all) || { echo "Build failed, checking undefined symbols..."; find out -name "*.o" | xargs nm -u | grep "ksu_handle_execve_ksud\|ksu_handle_devpts"; exit 1; }
 
       - name: Copy Images
         run: |
