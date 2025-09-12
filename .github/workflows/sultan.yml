@@ -91,7 +91,8 @@ jobs:
           patch -p1 < ../0001-SuSFS-1.5.9-v6.patch
           
           echo "Applying KSU managers patch..."
-          curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers.patch -o ../0001-add-more-managers.patch
+          
+          curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
           if [ ! -f 0001-add-more-managers.patch ]; then
           echo "Error: Failed to download KSU managers patch"
           exit 1
