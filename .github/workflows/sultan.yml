@@ -91,9 +91,16 @@ jobs:
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
           cd ./KernelSU-Next
+
           echo "Applying wild SUSFS Fix patches..."
-          cp ../../kernel_patches/next/0001-SuSFS-1.5.9-v6.patch ../
-          patch -p1 < 0001-SuSFS-1.5.9-v6.patch 
+          curl -Ls https://raw.githubusercontent.com/yapixel/kernel_patches/refs/heads/mksu/next/0001-SuSFS-1.5.9-v6.patch -o ../0001-SuSFS-1.5.9-v6.patch
+          if [ ! -f ../0001-SuSFS-1.5.9-v6.patch ]; then
+            echo "Error: Failed to download SUSFS fix patch"
+            exit 1
+          fi
+          patch -p1 < ../0001-SuSFS-1.5.9-v6.patch
+          
+          
 
           # Change to common directory and apply SUSFS patch
           cd ..
