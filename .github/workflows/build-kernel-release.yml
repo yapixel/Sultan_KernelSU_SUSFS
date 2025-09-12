@@ -56,6 +56,13 @@ jobs:
       RELEASE_NOTES: |
         This release contains KernelSU Next and SUSFS v1.5.9
         
+        ⚠️ **COMPATIBILITY NOTICE** ⚠️
+        Please ensure compatibility by comparing release dates with official Sultan kernel releases:
+        - Check official Sultan releases: https://github.com/kerneltoast/android_kernel_google_gs201/releases
+        - This build is based on the latest Sultan kernel commits as of build date
+        - Always verify your device's Android version matches the kernel target (Android 14)
+        - Recommended to use kernels released within 30 days of official Sultan updates
+        
         Module: 
         -> https://github.com/sidex15/ksu_module_susfs
         
@@ -69,6 +76,9 @@ jobs:
         [+] Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
         [+] Magic Mount Support
+        
+        📅 **Release Date Compatibility Check:**
+        - Built on: $(date '+%Y-%m-%d %H:%M:%S UTC')
 
     steps:
       # Checkout the code
