@@ -105,8 +105,8 @@ jobs:
           head -n 1200 ../kernel/core_hook.c | tail -n 50
 
           echo "Applying wild SUSFS Fix patches..."
-          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_core_hook.c.patch ./
-          patch -p1 -F 3 < fix_core_hook.c.patch || { echo "Patch failed, see rejects:"; cat fix_core_hook.c.rej; exit 1; }
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/01_fix_core_hook.c.patch ./
+          patch -p1 -F 3 < 01_fix_core_hook.c.patch || { echo "Patch failed, see rejects:"; cat fix_core_hook.c.rej; exit 1; }
 
           cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_sucompat.c.patch ./
           patch -p1 -F 3 < fix_sucompat.c.patch || { echo "Patch failed, see rejects:"; cat fix_sucompat.c.rej; exit 1; }
