@@ -67,6 +67,13 @@ jobs:
           git clone https://github.com/TheWildJames/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
+      - name: Upload Original core_hook.c
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-core-hook-${{ inputs.codename }}
+          path: ${{ inputs.repo }}/kernel/core_hook.c
+          retention-days: 5
+
       - name: Add KernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -112,6 +119,12 @@ jobs:
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || { echo "Patch failed, see rejects:"; cat 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch.rej; exit 1; }
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 -F 3 < sys.c_fix.patch || { echo "Patch failed, see rejects:"; cat sys.c_fix.patch.rej; exit 1; }
+
+      - name: List Patch Reject Files
+        if: always()
+        run: |
+          echo "Listing all .rej files..."
+          find . -name "*.rej" -exec echo "Found reject file: {}" \; -exec cat {} \;
 
       - name: Upload Patch Reject Files
         if: failure()
@@ -209,7 +222,6 @@ jobs:
           if [ "${{ inputs.codename }}" == "zumapro" ]; then
             export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
           fi
-          export KBUILD_CFLAGS="${KCFLAGS} -fno-lto"  # Disable LTO to isolate issue
           make ${{ inputs.codename }}_defconfig -j$(nproc --all)
           make -j$(nproc --all) || { echo "Build failed, checking undefined symbols..."; find out -name "*.o" | xargs nm -u | grep "ksu_handle_execve_ksud\|ksu_handle_devpts"; exit 1; }
 
