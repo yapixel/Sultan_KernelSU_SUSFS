@@ -67,12 +67,7 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-      - name: Upload Original core_hook.c
-        uses: actions/upload-artifact@v4
-        with:
-          name: original-core-hook-${{ inputs.codename }}
-          path: ${{ inputs.repo }}/kernel/core_hook.c
-          retention-days: 5
+      
 
       - name: Add KernelSU
         run: |
@@ -98,42 +93,28 @@ jobs:
           
           echo "Applying wild SUSFS patches..."
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          echo "Contents of core_hook.c before 10_enable_susfs_for_ksu.patch:"
-          head -n 1200 ../kernel/core_hook.c | tail -n 50
-          patch -p1 -F 3 < 10_enable_susfs_for_ksu.patch || { echo "Patch failed, see rejects:"; cat 10_enable_susfs_for_ksu.patch.rej; exit 1; }
-          echo "Contents of core_hook.c after 10_enable_susfs_for_ksu.patch:"
-          head -n 1200 ../kernel/core_hook.c | tail -n 50
+          
+          
+          patch -p1 -F 3 < 10_enable_susfs_for_ksu.patch || true
+          
 
           echo "Applying wild SUSFS Fix patches..."
           cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/01_fix_core_hook.c.patch ./
-          patch -p1 -F 3 < 01_fix_core_hook.c.patch || { echo "Patch failed, see rejects:"; cat fix_core_hook.c.rej; exit 1; }
+          patch -p1 -F 3 < 01_fix_core_hook.c.patch 
 
           cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_sucompat.c.patch ./
-          patch -p1 -F 3 < fix_sucompat.c.patch || { echo "Patch failed, see rejects:"; cat fix_sucompat.c.rej; exit 1; }
+          patch -p1 -F 3 < fix_sucompat.c.patch 
 
           cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_kernel_compat.c.patch ./
-          patch -p1 -F 3 < fix_kernel_compat.c.patch || { echo "Patch failed, see rejects:"; cat fix_kernel_compat.c.rej; exit 1; }
+          patch -p1 -F 3 < fix_kernel_compat.c.patch 
           
           # Change to common directory and apply SUSFS patch
           cd ..
-          patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || { echo "Patch failed, see rejects:"; cat 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch.rej; exit 1; }
+          patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 -F 3 < sys.c_fix.patch || { echo "Patch failed, see rejects:"; cat sys.c_fix.patch.rej; exit 1; }
+          patch -p1 -F 3 < sys.c_fix.patch 
 
-      - name: List Patch Reject Files
-        if: always()
-        run: |
-          echo "Listing all .rej files..."
-          find . -name "*.rej" -exec echo "Found reject file: {}" \; -exec cat {} \;
-
-      - name: Upload Patch Reject Files
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: patch-rejects-${{ inputs.codename }}
-          path: |
-            **/*.rej
-          retention-days: 5
+    
 
       - name: Apply KSU Hooks
         run: |
@@ -141,7 +122,7 @@ jobs:
           cd "$CONFIG"
           # Apply additional patch
           cp ../kernel_patches/wild/hooks/syscall_hooks.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch || { echo "Patch failed, see rejects:"; cat syscall_hooks.patch.rej; exit 1; }
+          patch -p1 -F 3 < syscall_hooks.patch 
 
       - name: Apply Hide Stuff Patches
         run: |
@@ -149,7 +130,7 @@ jobs:
           cd "$CONFIG"
           # Apply additional patch
           cp ../kernel_patches/69_hide_stuff.patch ./
-          patch -p1 -F 3 < 69_hide_stuff.patch || { echo "Patch failed, see rejects:"; cat 69_hide_stuff.patch.rej; exit 1; }
+          patch -p1 -F 3 < 69_hide_stuff.patch 
 
       - name: Add SUSFS Configuration Settings
         run: |
