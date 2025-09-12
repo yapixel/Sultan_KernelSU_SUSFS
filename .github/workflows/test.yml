@@ -1,0 +1,142 @@
+name: Build and Release Sultan Kernels test
+
+permissions:
+  contents: write  # Allow writing to repository contents (for pushing tags)
+  actions: write   # Allows triggering actions
+
+on:
+  workflow_dispatch:
+    inputs:
+      make_release:
+        description: 'Do you want to create a release?'
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  build-kernel-zuma:
+    uses: ./.github/workflows/sultan.yml
+    secrets: inherit
+    with:
+      codename: "zuma"
+      repo: "android_kernel_google_zuma"
+      android_version: "android14"
+      kernel_version: "6.1"
+
+  trigger-release:
+    runs-on: ubuntu-latest
+    needs:
+      - build-kernel-zuma
+    if: ${{ inputs.make_release }}
+    env:
+      REPO_OWNER: TheWildJames
+      REPO_NAME: Sultan_KernelSU_SUSFS
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU Next & SUSFS v1.5.9 *TEST BUILD*"
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4  # Updated to v4
+
+      # Generate Release Notes with Dynamic Date
+      - name: Generate Release Notes
+        run: |
+          RELEASE_NOTES=$(cat << 'EOF'
+          This release contains KernelSU Next and SUSFS v1.5.9
+
+          ⚠️ **COMPATIBILITY NOTICE** ⚠️
+          Please ensure compatibility by comparing release dates with official Sultan kernel releases:
+          - Check official Sultan releases: https://github.com/kerneltoast/android_kernel_google_gs201/releases
+          - This build is based on the latest Sultan kernel commits as of build date
+          - Always verify your device's Android version matches the kernel target (Android 14)
+          - Recommended to use kernels released within 30 days of official Sultan updates
+
+          Module: 
+          -> https://github.com/sidex15/ksu_module_susfs
+
+          Managers:
+          -> https://github.com/5ec1cff/KernelSU/
+          -> https://github.com/KernelSU-Next/KernelSU-Next
+
+          Features:
+          [+] MKSU & KernelSU-Next Managers
+          [+] SUSFS v1.5.9
+          [+] Maphide LineageOS Detections
+          [+] Futile Maphide for jit-zygote-cache Detections
+          [+] Magic Mount Support
+
+          📅 **Release Date Compatibility Check:**
+          - Built on: $(date '+%Y-%m-%d %H:%M:%S UTC')
+          EOF
+          )
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "$RELEASE_NOTES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      # Get the Latest Tag and Create New Tag
+      - name: Generate and Create New Tag
+        run: |
+          # Fetch the latest tag from GitHub
+          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v1.5.9-r0"
+          fi
+          # Validate tag format (e.g., v1.5.9-rN)
+          if [[ ! "$LATEST_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-r[0-9]+$ ]]; then
+            echo "Error: Latest tag ($LATEST_TAG) does not match expected format (vX.Y.Z-rN)"
+            exit 1
+          fi
+          # Increment the suffix
+          NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
+          echo "New tag: $NEW_TAG"
+          # Validate new tag format
+          if [[ ! "$NEW_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-r[0-9]+$ ]]; then
+            echo "Error: Generated tag ($NEW_TAG) does not match expected format (vX.Y.Z-rN)"
+            exit 1
+          fi
+          echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
+          # Create and push the tag
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+
+      # Download Artifacts
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./downloaded-artifacts
+
+      # Create GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2  # Updated to v2
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+          prerelease: true
+          name: ${{ env.RELEASE_NAME }}
+          body: ${{ env.RELEASE_NOTES }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Upload Release Assets Dynamically
+      - name: Upload Release Assets Dynamically
+        run: |
+          if ! compgen -G "./downloaded-artifacts/kernel-*/*" > /dev/null; then
+            echo "No artifacts found to upload"
+            exit 1
+          fi
+          for file in ./downloaded-artifacts/kernel-*/*; do
+            if [ -d "$file" ]; then
+              continue
+            fi
+            echo "Uploading $file..."
+            gh release upload ${{ env.NEW_TAG }} "$file"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_TAG: ${{ env.NEW_TAG }}
+
+      # Display Files Uploaded
+      - name: Display Files Uploaded
+        run: |
+          echo "GitHub release created with the following files:"
+          ls ./downloaded-artifacts/**/* || echo "No files found"
