@@ -66,6 +66,15 @@ jobs:
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
+
+      - name: Add dummy fw_sample.i file for gs201
+        if: ${{ inputs.codename == 'gs201' }}
+        run: |
+          echo "Adding dummy fw_sample.i file for gs201..."
+          cd "$CONFIG"
+          mkdir -p include/firmware
+          touch include/firmware/fw_sample.i
+          echo "Dummy fw_sample.i file created for gs201"
       
       - name: Add KernelSU
         run: |
