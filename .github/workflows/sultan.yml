@@ -65,30 +65,32 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -s next
+          curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/refs/heads/main/kernel/setup.sh  " | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
 
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           
-          echo "Applying SUSFS patches..."
-          
-          # Copy SUSFS patches
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
-          cp ../susfs4ksu/kernel_patches/fs/* ./fs/
-          cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-
-          cd ./KernelSU-Next
+          echo "Applying wild SUSFS patches..."
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
 
           echo "Applying wild SUSFS Fix patches..."
-          curl -Ls https://raw.githubusercontent.com/yapixel/kernel_patches/refs/heads/mksu/next/0001-SuSFS-1.5.9-v6.patch -o ../0001-SuSFS-1.5.9-v6.patch
-          if [ ! -f ../0001-SuSFS-1.5.9-v6.patch ]; then
-            echo "Error: Failed to download SUSFS fix patch"
-            exit 1
-          fi
-          patch -p1 < ../0001-SuSFS-1.5.9-v6.patch
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_core_hook.c.patch ./
+          patch -p1 --forward < fix_core_hook.c.patch
+
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_sucompat.c.patch ./
+          patch -p1 --forward < fix_sucompat.c.patch
+
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.9/fix_kernel_compat.c.patch ./
+          patch -p1 --forward < fix_kernel_compat.c.patch
+          
+          # Change to common directory and apply SUSFS patch
+          cd ..
+          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          cp ../kernel_patches/sultan/sys.c_fix.patch ./
+          patch -p1 --fuzz=3 < sys.c_fix.patch
           
           # echo "Applying KSU managers patch..."
           # curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
