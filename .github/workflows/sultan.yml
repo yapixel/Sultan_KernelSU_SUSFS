@@ -58,7 +58,7 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
           cd susfs4ksu
-          git reset --hard 646cfabce9d5dba5b806e9cbe2c198128ebd0e69
+          git reset --hard 6a467fbc76d15a08189e367f17463a10930bca8d
 
           cd -
       
@@ -69,7 +69,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 55820e49f2e258426ae635182a89b5a655b6c5d5
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
           #curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
 
           
