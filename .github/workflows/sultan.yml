@@ -207,8 +207,8 @@ jobs:
           #fi
           
           # Set toolchain paths
-          export CROSS_COMPILE=$HOME/gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-
-          export CC=$HOME/gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-gcc
+          export CROSS_COMPILE=../gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-
+          export CC=../gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-gcc
           
           make CROSS_COMPILE=$CROSS_COMPILE CC=$CC -j$(nproc --all) ${{ inputs.codename }}_defconfig
           make CROSS_COMPILE=$CROSS_COMPILE CC=$CC -j$(nproc --all)
