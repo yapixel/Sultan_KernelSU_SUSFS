@@ -36,10 +36,18 @@ jobs:
           remove-cached-tools: 'false'   # Avoid unless confirmed safe
           verbose: 'true'                # Enable detailed logging
           
-      - name: Installing dependencies
+
+      - name: Download and extract GCC 15.2.0 toolchain
         run: |
-          sudo apt update
-          sudo apt install -y gcc-aarch64-linux-gnu
+          echo "Downloading GCC 15.2.0 cross-compiler toolchain..."
+          wget https://www.kernel.org/pub/tools/crosstool/files/bin/x86_64/15.2.0/x86_64-gcc-15.2.0-nolibc-aarch64-linux.tar.gz
+          echo "Extracting .gz file..."
+          gunzip x86_64-gcc-15.2.0-nolibc-aarch64-linux.tar.gz
+          echo "Extracting .tar file..."
+          tar -xf x86_64-gcc-15.2.0-nolibc-aarch64-linux.tar
+          #echo "Adding toolchain to PATH..."
+          #echo "$PWD/gcc-15.2.0-nolibc/aarch64-linux/bin" >> $GITHUB_PATH
+          #echo "GCC 15.2.0 toolchain installed successfully"
 
       - name: Set CONFIG Environment Variable
         run: |
@@ -193,12 +201,17 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           
-          echo "Building the kernel..."
-          if [ "${{ inputs.codename }}" == "zumapro" ]; then
-            export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
-          fi
-          make ${{ inputs.codename }}_defconfig -j$(nproc --all)
-          make -j$(nproc --all)
+          #echo "Building the kernel..."
+          #if [ "${{ inputs.codename }}" == "zumapro" ]; then
+          #  export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
+          #fi
+          
+          # Set toolchain paths
+          export CROSS_COMPILE=$HOME/gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-
+          export CC=$HOME/gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-gcc
+          
+          make CROSS_COMPILE=$CROSS_COMPILE CC=$CC -j$(nproc --all) ${{ inputs.codename }}_defconfig
+          make CROSS_COMPILE=$CROSS_COMPILE CC=$CC -j$(nproc --all)
 
       - name: Copy Images
         run: |

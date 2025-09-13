@@ -5,6 +5,10 @@ permissions:
   actions: write   # Allows triggering actions
   
 on:
+  push:
+    branches:
+      - main
+      - master
   workflow_dispatch:
     inputs:
       make_release:
@@ -47,7 +51,7 @@ jobs:
         - build-kernel-gs201
         - build-kernel-zuma
         - build-kernel-zumapro
-    if: ${{ inputs.make_release }}
+    if: ${{ inputs.make_release || github.event_name == 'push' }}
     env:
       REPO_OWNER: TheWildJames
       REPO_NAME: Sultan_KernelSU_SUSFS
