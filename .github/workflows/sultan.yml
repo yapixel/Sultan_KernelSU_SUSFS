@@ -45,9 +45,9 @@ jobs:
           gunzip x86_64-gcc-15.2.0-nolibc-aarch64-linux.tar.gz
           echo "Extracting .tar file..."
           tar -xf x86_64-gcc-15.2.0-nolibc-aarch64-linux.tar
-          #echo "Adding toolchain to PATH..."
-          #echo "$PWD/gcc-15.2.0-nolibc/aarch64-linux/bin" >> $GITHUB_PATH
-          #echo "GCC 15.2.0 toolchain installed successfully"
+          echo "Adding toolchain to PATH..."
+          echo "$PWD/gcc-15.2.0-nolibc/aarch64-linux/bin" >> $GITHUB_PATH
+          echo "GCC 15.2.0 toolchain installed successfully"
 
       - name: Set CONFIG Environment Variable
         run: |
@@ -207,8 +207,8 @@ jobs:
           #fi
           
           # Set toolchain paths
-          export CROSS_COMPILE=../gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-
-          export CC=../gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-gcc
+          export CROSS_COMPILE=$HOME/work/Sultan_KernelSU_SUSFS/Sultan_KernelSU_SUSFS/gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-
+          export CC=$HOME/work/Sultan_KernelSU_SUSFS/Sultan_KernelSU_SUSFS/gcc-15.2.0-nolibc/aarch64-linux/bin/aarch64-linux-gcc
           
           make CROSS_COMPILE=$CROSS_COMPILE CC=$CC -j$(nproc --all) ${{ inputs.codename }}_defconfig
           make CROSS_COMPILE=$CROSS_COMPILE CC=$CC -j$(nproc --all)
