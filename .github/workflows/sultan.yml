@@ -94,7 +94,7 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
-          cp ../kernel_pstches/sultan/core_hook.c_fix.patch ./
+          cp ../kernel_patches/sultan/core_hook.c_fix.patch ./
           patch -p1 --fuzz=3 < core_hook.c_fix.patch
           
           # echo "Applying KSU managers patch..."
