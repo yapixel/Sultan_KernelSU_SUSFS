@@ -90,8 +90,8 @@ jobs:
           patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
 
           
-          cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
-          patch -p1 --forward < fix_core_hook.c.patch
+          #cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
+          #patch -p1 --forward < fix_core_hook.c.patch
           #cp ../../kernel_patches/sultan/core_hook.c_fix.patch ./
           #patch -p1 --forward < core_hook.c_fix.patch
           
