@@ -45,7 +45,7 @@ jobs:
           echo "Cloning AnyKernel3 and other dependencies..."
           
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-android14-6.1-dev"
+          SUSFS_BRANCH="gki-android14-6.1"
           
           # Debug print the branches
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
@@ -53,7 +53,7 @@ jobs:
 
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
-          git clone https://gitlab.com/pershoot/susfs4ksu.git -b "$SUSFS_BRANCH"
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
@@ -65,8 +65,8 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
-
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
+    
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -77,7 +77,7 @@ jobs:
           
           # Copy SUSFS patches
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
+          
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
@@ -87,8 +87,7 @@ jobs:
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
           patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
 
-          cp ../../kernel_patches/sultan/core_hook.c_fix.patch ./
-          patch -p1 --fuzz=3 < core_hook.c_fix.patch
+          
           
           # Change to common directory and apply SUSFS patch
           cd ..
