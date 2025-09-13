@@ -65,8 +65,8 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
-          curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
+          #curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
 
           
       - name: Apply SUSFS Patches
