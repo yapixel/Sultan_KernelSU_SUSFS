@@ -87,9 +87,10 @@ jobs:
         if: ${{ inputs.codename == 'gs201' }}
         run: |
           echo "Adding dummy fw_sample.i file for gs201..."
-          cd "$CONFIG/${{ inputs.repo }}"
-          mkdir -p include/firmware
-          touch include/firmware/fw_sample.i
+          cd "$CONFIG/include/"
+          mkdir firmware
+          cd firmware
+          touch fw_sample.i
           echo "Dummy fw_sample.i file created for gs201"
       
       - name: Add KernelSU
