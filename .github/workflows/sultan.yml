@@ -89,8 +89,8 @@ jobs:
           # Change to common directory and apply SUSFS patch
           # cd ..
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch
-       #cp ../kernel_patches/sultan/sys.c_fix.patch ./
-       #patch -p1 --fuzz=3 < sys.c_fix.patch
+          #cp ../kernel_patches/sultan/sys.c_fix.patch ./
+          #patch -p1 --fuzz=3 < sys.c_fix.patch
 
 
           cd ./KernelSU
