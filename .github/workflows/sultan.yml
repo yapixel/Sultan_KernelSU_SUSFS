@@ -69,7 +69,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s v1.0.5
           #curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/refs/heads/main/kernel/setup.sh" | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
 
           
@@ -83,7 +83,6 @@ jobs:
           
           # Copy SUSFS patches
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
@@ -94,10 +93,10 @@ jobs:
           patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
 
           
-          cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
-          patch -p1 --forward < fix_core_hook.c.patch
-          cp ../../kernel_patches/sultan/fix_rules.c.patch ./
-          patch -p1 --forward < fix_rules.c.patch
+          #cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
+          #patch -p1 --forward < fix_core_hook.c.patch
+          #cp ../../kernel_patches/sultan/fix_rules.c.patch ./
+          #patch -p1 --forward < fix_rules.c.patch
           
           # Change to common directory and apply SUSFS patch
           cd ..
@@ -107,9 +106,9 @@ jobs:
 
       
           
-          # echo "Applying KSU managers patch..."
-          # curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
-          # patch -p1 < ../0001-add-more-managers.patch
+           echo "Applying KSU managers patch..."
+           curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
+           patch -p1 < ../0001-add-more-managers.patch
           
 
     
