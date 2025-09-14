@@ -106,9 +106,9 @@ jobs:
 
       
           
-           echo "Applying KSU managers patch..."
-           curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
-           patch -p1 < ../0001-add-more-managers.patch
+          # echo "Applying KSU managers patch..."
+          # curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
+          # patch -p1 < ../0001-add-more-managers.patch
           
 
     
