@@ -37,9 +37,9 @@ jobs:
       REPO_OWNER: yapixel
       REPO_NAME: Sultan_KernelSU_SUSFS
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU Next & SUSFS v1.5.9 *TEST BUILD*"
+      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU & SUSFS v1.5.9 *TEST BUILD*"
       RELEASE_NOTES: |
-        This release contains KernelSU Next and SUSFS v1.5.9
+        This release contains KernelSU and SUSFS v1.5.9
         
         ⚠️ **COMPATIBILITY NOTICE** ⚠️
         Please ensure compatibility by comparing release dates with official Sultan kernel releases:
@@ -53,10 +53,10 @@ jobs:
         
         Managers:
         -> https://github.com/5ec1cff/KernelSU/
-        -> https://github.com/KernelSU-Next/KernelSU-Next
+        -> https://github.com/tianm/KernelSU/
         
         Features:
-        [+] MKSU & KernelSU-Next Managers
+        [+] MKSU & KernelSU Managers v1.0.5
         [+] SUSFS v1.5.9
         [+] Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
