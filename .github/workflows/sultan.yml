@@ -90,9 +90,9 @@ jobs:
           fi
           patch -p1 < ../0001-SuSFS-1.5.9-v6.patch
           
-          # echo "Applying KSU managers patch..."
-          # curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
-          # patch -p1 < ../0001-add-more-managers.patch
+          echo "Applying KSU managers patch..."
+          curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-only-WKSU-and-MKSU-managers-and-KSUN.patch -o ../0001-add-only-WKSU-and-MKSU-managers-and-KSUN.patch
+          patch -p1 < ../0001-add-only-WKSU-and-MKSU-managers-and-KSUN.patch
 
           # Change to common directory and apply SUSFS patch
           cd ..
