@@ -57,9 +57,9 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-          cd susfs4ksu
+          #cd susfs4ksu
           #git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
-          git reset --hard 6a467fbc76d15a08189e367f17463a10930bca8d
+          #git reset --hard 6a467fbc76d15a08189e367f17463a10930bca8d
 
           cd -
       
@@ -72,7 +72,7 @@ jobs:
           echo "Adding KernelSU..."
           #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v1.0.5
           #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
-          curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
+          curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash -s main
 
           
       - name: Apply SUSFS Patches
