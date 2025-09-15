@@ -61,7 +61,7 @@ jobs:
           #git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
           #git reset --hard 6a467fbc76d15a08189e367f17463a10930bca8d
 
-          cd -
+          #cd -
       
 
       - name: Add KernelSU
