@@ -71,8 +71,8 @@ jobs:
           
           echo "Adding KernelSU..."
           #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v1.0.5
-          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
-          #curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
+          #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
+          curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash -s 63c615ebc6ad0dd7b2a59f44809cbfdfabb82546
 
           
       - name: Apply SUSFS Patches
@@ -102,8 +102,8 @@ jobs:
           patch -p1  < 10_enable_susfs_for_ksu.patch
 
           
-          #cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
-          #patch -p1 --forward < fix_core_hook.c.patch
+          cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
+          patch -p1 --forward < fix_core_hook.c.patch
           #cp ../../kernel_patches/sultan/fix_rules.c.patch ./
           #patch -p1 --forward < fix_rules.c.patch
           
