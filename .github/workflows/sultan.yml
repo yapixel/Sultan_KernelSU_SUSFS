@@ -104,8 +104,8 @@ jobs:
           cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
           patch -p1 --fuzz=3 < fix_core_hook.c.patch
 
-          cp ../../kernel_patches/mksu/dix_rules.c.patch ./
-          patch -p1 --fuzz=3 < fix_rules.c.patch
+          #cp ../../kernel_patches/mksu/dix_rules.c.patch ./
+          #patch -p1 --fuzz=3 < fix_rules.c.patch
           
 
       
