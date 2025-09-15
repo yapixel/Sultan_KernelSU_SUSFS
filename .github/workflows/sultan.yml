@@ -58,8 +58,8 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
           cd susfs4ksu
-          git reset --hard b5c3ada461a61c6ad033693b7a00494ead3a28fd
-          #git reset --hard 6a467fbc76d15a08189e367f17463a10930bca8d
+          #git reset --hard b5c3ada461a61c6ad033693b7a00494ead3a28fd
+          git reset --hard 6a467fbc76d15a08189e367f17463a10930bca8d
 
           cd -
       
@@ -99,7 +99,7 @@ jobs:
           
           echo "Apply KSU integration patches"
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1  < 10_enable_susfs_for_ksu.patch
+          patch -p1  < 10_enable_susfs_for_ksu.patch || true
           
           cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
           patch -p1 --forward < fix_core_hook.c.patch
