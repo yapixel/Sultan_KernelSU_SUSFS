@@ -57,11 +57,11 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-          #cd susfs4ksu
+          cd susfs4ksu
           #git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
-          #git reset --hard 6a467fbc76d15a08189e367f17463a10930bca8d
+          git reset --hard 6a467fbc76d15a08189e367f17463a10930bca8d
 
-          #cd -
+          cd -
       
 
       - name: Add KernelSU
@@ -81,7 +81,7 @@ jobs:
           cd "$CONFIG"
 
           
-          echo "Applying SUSFS patches..."
+          echo "Applying core SUSFS patches..."
           
           # Copy SUSFS patches
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
@@ -90,23 +90,19 @@ jobs:
 
           # Change to common directory and apply SUSFS patch
           # cd ..
-          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
-
+          # Apply KSU integration patches
           cd ./KernelSU
           
-          echo "Applying wild SUSFS patches..."
+          echo "Apply KSU integration patches"
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
           patch -p1  < 10_enable_susfs_for_ksu.patch
-
           
           cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
           patch -p1 --forward < fix_core_hook.c.patch
-          #cp ../../kernel_patches/sultan/fix_rules.c.patch ./
-          #patch -p1 --forward < fix_rules.c.patch
-          
           
 
       
