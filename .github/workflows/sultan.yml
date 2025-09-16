@@ -66,7 +66,7 @@ jobs:
           echo "Adding KernelSU..."
         
           #curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash -s main
-          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/refs/heads/master/kernel/setup.sh" | bash v1.0.0-43
+          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/refs/heads/master/kernel/setup.sh" | bash v1.0.5-43
           
 
 
@@ -97,8 +97,8 @@ jobs:
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
           patch -p1  < 10_enable_susfs_for_ksu.patch || true
           
-          cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
-          patch -p1 --fuzz=3 < fix_core_hook.c.patch
+          #cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
+          #patch -p1 --fuzz=3 < fix_core_hook.c.patch
           
           
       - name: Getting KernelSU Version
