@@ -56,137 +56,137 @@ jobs:
           
           # Patch for fs/exec.c (adjusted for short do_execveat_common)
           cat > patches/01_kernelsu_exec.patch << 'EOF'
-diff --git a/fs/exec.c b/fs/exec.c
---- a/fs/exec.c
-+++ b/fs/exec.c
-@@ -1,3 +1,10 @@
-+#ifdef CONFIG_KSU
-+extern bool ksu_execveat_hook __read_mostly;
-+extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
-+			void *envp, int *flags);
-+extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
-+				 void *argv, void *envp, int *flags);
-+#endif
- static int do_execveat_common(int fd, struct filename *filename,
+           diff --git a/fs/exec.c b/fs/exec.c
+           --- a/fs/exec.c
+           +++ b/fs/exec.c
+           @@ -1,3 +1,10 @@
+           +#ifdef CONFIG_KSU
+           +extern bool ksu_execveat_hook __read_mostly;
+           +extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
+           +			void *envp, int *flags);
+           +extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
+           +				 void *argv, void *envp, int *flags);
+           +#endif
+           static int do_execveat_common(int fd, struct filename *filename,
  			      struct user_arg_ptr argv,
  			      struct user_arg_ptr envp,
  			      int flags)
- {
-+   #ifdef CONFIG_KSU
-+	if (unlikely(ksu_execveat_hook))
-+		ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
-+	else
-+		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
-+   #endif
- 	return __do_execve_file(fd, filename, argv, envp, flags, NULL);
- }
-EOF
+            {
+           +   #ifdef CONFIG_KSU
+           +	if (unlikely(ksu_execveat_hook))
+           +		ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
+           +	else
+           +		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
+           +   #endif
+        	return __do_execve_file(fd, filename, argv, envp, flags, NULL);
+         }
+         EOF
 
           # Patch for fs/open.c (do_faccessat)
           cat > patches/02_kernelsu_open.patch << 'EOF'
-diff --git a/fs/open.c b/fs/open.c
---- a/fs/open.c
-+++ b/fs/open.c
-@@ -1,3 +1,7 @@
-+#ifdef CONFIG_KSU
-+extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
-+			 int *flags);
-+#endif
- long do_faccessat(int dfd, const char __user *filename, int mode)
- {
-+   #ifdef CONFIG_KSU
-+	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
-+   #endif
- 	const struct cred *old_cred;
- 	struct cred *override_cred;
- 	struct path path;
-EOF
+          diff --git a/fs/open.c b/fs/open.c
+          --- a/fs/open.c
+          +++ b/fs/open.c
+          @@ -1,3 +1,7 @@
+         +#ifdef CONFIG_KSU
+         +extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
+         +			 int *flags);
+         +#endif
+         long do_faccessat(int dfd, const char __user *filename, int mode)
+        {
+        +   #ifdef CONFIG_KSU
+        +	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
+        +   #endif
+      	const struct cred *old_cred;
+     	struct cred *override_cred;
+ 	    struct path path;
+        EOF
 
           # Patch for fs/read_write.c (vfs_read)
           cat > patches/03_kernelsu_read_write.patch << 'EOF'
-diff --git a/fs/read_write.c b/fs/read_write.c
---- a/fs/read_write.c
-+++ b/fs/read_write.c
-@@ -1,3 +1,7 @@
-+#ifdef CONFIG_KSU
-+extern bool ksu_vfs_read_hook __read_mostly;
-+extern int ksu_handle_vfs_read(struct file **file_ptr, char __user **buf_ptr,
-+			size_t *count_ptr, loff_t **pos);
-+#endif
- ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
- {
- 	ssize_t ret;
-+   #ifdef CONFIG_KSU 
-+	if (unlikely(ksu_vfs_read_hook))
-+		ksu_handle_vfs_read(&file, &buf, &count, &pos);
-+   #endif
-+
- 	if (!(file->f_mode & FMODE_READ))
- 		return -EBADF;
-EOF
+          diff --git a/fs/read_write.c b/fs/read_write.c
+          --- a/fs/read_write.c
+          +++ b/fs/read_write.c
+          @@ -1,3 +1,7 @@
+          +#ifdef CONFIG_KSU
+          +extern bool ksu_vfs_read_hook __read_mostly;
+          +extern int ksu_handle_vfs_read(struct file **file_ptr, char __user **buf_ptr,
+          +			size_t *count_ptr, loff_t **pos);
+          +#endif
+           ssize_t vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos)
+          {
+         	ssize_t ret;
+     +   #ifdef CONFIG_KSU 
+     +	if (unlikely(ksu_vfs_read_hook))
+     +		ksu_handle_vfs_read(&file, &buf, &count, &pos);
+     +   #endif
+     +
+    	if (!(file->f_mode & FMODE_READ))
+    		return -EBADF;
+     EOF
 
           # Patch for fs/stat.c (vfs_fstatat, since source has it)
           cat > patches/04_kernelsu_stat.patch << 'EOF'
-diff --git a/fs/stat.c b/fs/stat.c
---- a/fs/stat.c
-+++ b/fs/stat.c
-@@ -1,3 +1,5 @@
-+#ifdef CONFIG_KSU
-+extern int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags);
-+#endif
- int vfs_fstatat(int dfd, const char __user *filename, struct kstat *stat,
- 		int flag)
- {
-@@ -1,3 +1,5 @@
- 	int error = -EINVAL;
- 	unsigned int lookup_flags = 0;
-+   #ifdef CONFIG_KSU 
-+	ksu_handle_stat(&dfd, &filename, &flag);
-+   #endif
-+
- 	if ((flag & ~(AT_SYMLINK_NOFOLLOW | AT_NO_AUTOMOUNT |
+          diff --git a/fs/stat.c b/fs/stat.c
+          --- a/fs/stat.c
+          +++ b/fs/stat.c
+          @@ -1,3 +1,5 @@
+          +#ifdef CONFIG_KSU
+          +extern int ksu_handle_stat(int *dfd, const char __user **filename_user, int *flags);
+          +#endif
+            int vfs_fstatat(int dfd, const char __user *filename, struct kstat *stat,
+    	    int flag)
+          {
+        @@ -1,3 +1,5 @@
+ 	    int error = -EINVAL;
+ 	    unsigned int lookup_flags = 0;
+        +   #ifdef CONFIG_KSU 
+        +	ksu_handle_stat(&dfd, &filename, &flag);
+        +   #endif
+        +
+ 	    if ((flag & ~(AT_SYMLINK_NOFOLLOW | AT_NO_AUTOMOUNT |
  		      AT_EMPTY_PATH)) != 0)
- 		goto out;
-EOF
+ 	   	goto out;
+        EOF
 
           # Patch for drivers/input/input.c (input_handle_event)
           cat > patches/05_kernelsu_input.patch << 'EOF'
-diff --git a/drivers/input/input.c b/drivers/input/input.c
---- a/drivers/input/input.c
-+++ b/drivers/input/input.c
-@@ -1,3 +1,6 @@
-+#ifdef CONFIG_KSU
-+extern bool ksu_input_hook __read_mostly;
-+extern int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);
-+#endif
- static void input_handle_event(struct input_dev *dev,
+         diff --git a/drivers/input/input.c b/drivers/input/input.c
+         --- a/drivers/input/input.c
+         +++ b/drivers/input/input.c
+         @@ -1,3 +1,6 @@
+        +#ifdef CONFIG_KSU
+        +extern bool ksu_input_hook __read_mostly;
+        +extern int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);
+        +#endif
+          static void input_handle_event(struct input_dev *dev,
  			       unsigned int type, unsigned int code, int value)
- {
-	int disposition = input_get_disposition(dev, type, code, &value);
-+   #ifdef CONFIG_KSU
-+	if (unlikely(ksu_input_hook))
-+		ksu_handle_input_handle_event(&type, &code, &value);
-+   #endif
-EOF
+        {
+	   int disposition = input_get_disposition(dev, type, code, &value);
+     +   #ifdef CONFIG_KSU
+     +	if (unlikely(ksu_input_hook))
+     +		ksu_handle_input_handle_event(&type, &code, &value);
+     +   #endif
+   EOF
 
           # Patch for fs/devpts/inode.c (devpts_get_priv)
           cat > patches/06_kernelsu_devpts.patch << 'EOF'
-diff --git a/fs/devpts/inode.c b/fs/devpts/inode.c
---- a/fs/devpts/inode.c
-+++ b/fs/devpts/inode.c
-@@ -1,3 +1,5 @@
-+#ifdef CONFIG_KSU
-+extern int ksu_handle_devpts(struct inode*);
-+#endif
- void *devpts_get_priv(struct dentry *dentry)
- {
-+       #ifdef CONFIG_KSU
-+       ksu_handle_devpts(dentry->d_inode);
-+       #endif
+          diff --git a/fs/devpts/inode.c b/fs/devpts/inode.c
+          --- a/fs/devpts/inode.c
+          +++ b/fs/devpts/inode.c
+          @@ -1,3 +1,5 @@
+         +#ifdef CONFIG_KSU
+        +extern int ksu_handle_devpts(struct inode*);
+        +#endif
+        void *devpts_get_priv(struct dentry *dentry)
+         {
+        +       #ifdef CONFIG_KSU
+        +       ksu_handle_devpts(dentry->d_inode);
+        +       #endif
         if (dentry->d_sb->s_magic != DEVPTS_SUPER_MAGIC)
                 return NULL;
         return dentry->d_fsdata;
-EOF
+       EOF
 
       - name: Apply Manual KernelSU Patches
         run: |
