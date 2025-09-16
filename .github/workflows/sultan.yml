@@ -56,12 +56,6 @@ jobs:
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
-
-          #cd susfs4ksu
-          #git reset --hard b5c3ada461a61c6ad033693b7a00494ead3a28fd
-          #git reset --hard a4ad7c95da0dddc67ca9661dae0ef83da7464714
-
-          #cd -
       
 
       - name: Add KernelSU
@@ -70,8 +64,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v1.0.5
-          #curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s 4d3560b12bec5f238fe11f908a246f0ac97e9c27
+        
           curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash -s main
 
           
@@ -89,7 +82,7 @@ jobs:
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
           # Change to common directory and apply SUSFS patch
-          # cd ..
+         
           patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
@@ -103,35 +96,26 @@ jobs:
           
           cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
           patch -p1 --fuzz=3 < fix_core_hook.c.patch
-
-          #cp ../../kernel_patches/mksu/dix_rules.c.patch ./
-          #patch -p1 --fuzz=3 < fix_rules.c.patch
           
-
-      
           
-          # echo "Applying KSU managers patch..."
-          # curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-more-managers_v2.patch -o ../0001-add-more-managers.patch
-          # patch -p1 < ../0001-add-more-managers.patch
-          
-
+      - name: Getting KernelSU Version
+        run: |
+          cd "$CONFIG/KernelSU/kernel"
+          BASE_VERSION=10200
+          COMMIT_COUNT=$(/usr/bin/git rev-list --count HEAD)
+          KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
+          echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
     
 
-   #   - name: Apply KSU Hooks
-   #    run: |
-   #       echo "Changing to configuration directory: $CONFIG..."
-   #       cd "$CONFIG"
-          # Apply additional patch
-   #       cp ../kernel_patches/wild/hooks/syscall_hooks.patch ./
-   #       patch -p1 -F 3 < syscall_hooks.patch 
+  
 
-   #   - name: Apply Hide Stuff Patches
-   #     run: |
-   #       echo "Changing to configuration directory: $CONFIG..."
-   #       cd "$CONFIG"
-   #       # Apply additional patch
-    #      cp ../kernel_patches/69_hide_stuff.patch ./
-   #       patch -p1 -F 3 < 69_hide_stuff.patch 
+      - name: Apply Hide Stuff Patches
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          # Apply additional patch
+          cp ../kernel_patches/69_hide_stuff.patch ./
+          patch -p1 -F 3 < 69_hide_stuff.patch 
 
       - name: Add SUSFS Configuration Settings
         run: |
@@ -254,7 +238,7 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="${{ inputs.codename }}_A16_Sultan_MKSU_SUSFS.zip"
+          ZIP_NAME="MKSU-${{ env.KSUVER }}-${{ inputs.codename }}_A16_Sultan_MKSU_SUSFS.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
           
