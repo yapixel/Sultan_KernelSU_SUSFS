@@ -272,22 +272,35 @@ jobs:
           grep -r "ksu_handle_execve_ksud" . || echo "ksu_handle_execve_ksud not found"
           grep -r "ksu_handle_devpts" . || echo "ksu_handle_devpts not found"
 
+      - name: Generate Kernel Config
+        run: |
+         echo "Generating kernel config with O=out..."
+         cd "$CONFIG"
+         echo "CONFIG_KSU=y" >> arch/arm64/configs/${{ inputs.codename }}_defconfig
+         echo "CONFIG_KSU_KPROBES_HOOK=n" >> arch/arm64/configs/${{ inputs.codename }}_defconfig
+         make O=out ${{ inputs.codename }}_defconfig -j$(nproc --all)
+         if ! grep -q "CONFIG_KSU=y" out/.config; then
+         echo "ERROR: CONFIG_KSU not enabled in out/.config!"
+         exit 1
+         fi
+         grep CONFIG_KSU out/.config
+         grep CONFIG_KSU_WITH_KPROBES out/.config || echo "CONFIG_KSU_WITH_KPROBES not set"
+
       - name: Compile KernelSU Explicitly
         run: |
-          echo "Attempting to compile KernelSU objects..."
-          cd "$CONFIG"
-          echo "Compiling ksu.c..."
-          make V=1 O=out KernelSU/kernel/ksu.o || {
-          echo "ERROR: Failed to compile ksu.c! Check for errors above."
-          exit 1
+         echo "Attempting to compile KernelSU objects with O=out..."
+         cd "$CONFIG"
+         make O=out V=1 KernelSU/kernel/ksu.o || {
+         echo "ERROR: Failed to compile ksu.c! Check for errors above."
+         exit 1
           }
-          echo "Compiling other KernelSU objects..."
-          make V=1 O=out KernelSU/kernel/sucompat.o KernelSU/kernel/ksud.o || {
-          echo "ERROR: Failed to compile sucompat.o or ksud.o!"
-          exit 1
-          }
-          ls -l out/KernelSU/kernel/*.o || echo "ERROR: No KernelSU objects generated!"
-      
+         make O=out V=1 KernelSU/kernel/sucompat.o KernelSU/kernel/ksud.o || {
+         echo "ERROR: Failed to compile sucompat.o or ksud.o!"
+         exit 1
+         }
+         ls -l out/KernelSU/kernel/*.o || echo "ERROR: No KernelSU objects generated!"
+
+         
       - name: Build the Kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
