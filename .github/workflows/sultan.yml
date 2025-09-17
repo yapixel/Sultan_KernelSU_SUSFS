@@ -203,6 +203,22 @@ jobs:
           echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
 
+      - name: Verify KernelSU Configuration
+        run: |
+          echo "Checking kernel configuration for CONFIG_KSU..."
+          cd "$CONFIG"
+          echo "CONFIG_KSU=y" >> arch/arm64/configs/${{ inputs.codename }}_defconfig
+          echo "CONFIG_KSU_KPROBES_HOOK=n" >> arch/arm64/configs/${{ inputs.codename }}_defconfig
+          make ${{ inputs.codename }}_defconfig O=out -j$(nproc --all)
+          if ! grep -q "CONFIG_KSU=y" out/.config; then
+          echo "ERROR: CONFIG_KSU not enabled in out/.config!"
+          exit 1
+          fi
+          grep CONFIG_KSU out/.config
+          grep CONFIG_KSU_WITH_KPROBES out/.config || echo "CONFIG_KSU_WITH_KPROBES not set"
+          echo "Saving .config for debugging..."
+          cp out/.config config_debug.txt
+
       - name: Run sed and perl Commands
         run: |
           echo "Changing to configuration directory: $CONFIG..."
