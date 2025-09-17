@@ -210,7 +210,21 @@ jobs:
           
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
- 
+
+      - name: Verify KSU Makefile
+        run: |
+         echo "Checking KernelSU Makefile..."
+         cd "$CONFIG/KernelSU/kernel"
+         if ! grep -q "obj-\$(CONFIG_KSU) += kernelsu.o" Makefile; then
+         echo "ERROR: kernelsu.o not in Makefile!"
+         exit 1
+         fi
+         if ! grep -q "kernelsu-objs := ksu.o" Makefile; then
+         echo "ERROR: ksu.o not in kernelsu-objs!"
+         exit 1
+         fi
+         cat Makefile
+      
       - name: Ensure KSU in google-modules Link
         run: |
          echo "Checking google-modules Makefile rules..."
