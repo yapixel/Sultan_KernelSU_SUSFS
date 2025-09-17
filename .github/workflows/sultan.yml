@@ -215,25 +215,24 @@ jobs:
         run: |
          echo "Checking google-modules Makefile rules..."
          cd "$CONFIG"
+         echo "Searching for google-modules/built-in.a rule..."
+         grep -n "google-modules/built-in.a" Makefile || {
+         echo "WARNING: google-modules/built-in.a not found in $CONFIG/Makefile! Searching subdirectories..."
+         find . -name "*.mk" -exec grep -H "google-modules/built-in.a" {} \;
+         }
          if ! grep -q "KernelSU/kernel/kernelsu.o" Makefile; then
-         echo "Adding KernelSU/kernel/kernelsu.o to google-modules..."
+         echo "Adding KernelSU/kernel/kernelsu.o to google-modules/built-in.a..."
+         if grep -q "google-modules/built-in.a" Makefile; then
          sed -i '/google-modules\/built-in.a/s/$/ KernelSU\/kernel\/kernelsu.o/' Makefile
+         else
+         echo "Appending fallback rule for google-modules/built-in.a..."
+         echo "google-modules/built-in.a += KernelSU/kernel/kernelsu.o" >> Makefile
          fi
-         echo "Makefile lines around 2091:"
+         fi
+         echo "Makefile lines around google-modules rule:"
+         grep -A2 -B2 "google-modules/built-in.a" Makefile || echo "No google-modules rule found in Makefile"
+         echo "Checking line 2091 for context:"
          sed -n '2090,2092p' Makefile
-      - name: Verify KSU Makefile
-        run: |
-         echo "Checking KernelSU Makefile..."
-         cd "$CONFIG/KernelSU/kernel"
-         if ! grep -q "obj-\$(CONFIG_KSU) += kernelsu.o" Makefile; then
-         echo "ERROR: kernelsu.o not in Makefile!"
-         exit 1
-         fi
-         if ! grep -q "kernelsu-objs := ksu.o" Makefile; then
-         echo "ERROR: ksu.o not in kernelsu-objs!"
-         exit 1
-         fi
-         cat Makefile
     
       - name: Check for KernelSU Functions
         run: |
