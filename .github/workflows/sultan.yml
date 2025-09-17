@@ -274,16 +274,19 @@ jobs:
 
       - name: Compile KernelSU Explicitly
         run: |
-         echo "Attempting to compile KernelSU/kernel/ksu.c..."
-         cd "$CONFIG"
-         make V=1 KernelSU/kernel/ksu.o || {
-         echo "ERROR: Failed to compile ksu.c! Check for errors above."
-         find . -name "*.o" -exec grep -l "error:" {} \;
-         exit 1
-         }
-         ls -l out/KernelSU/kernel/ksu.o || echo "ERROR: ksu.o not generated!"
-         echo "Checking other KernelSU objects..."
-         ls -l out/KernelSU/kernel/*.o || echo "No other KernelSU objects found!"
+          echo "Attempting to compile KernelSU objects..."
+          cd "$CONFIG"
+          echo "Compiling ksu.c..."
+          make V=1 O=out KernelSU/kernel/ksu.o || {
+          echo "ERROR: Failed to compile ksu.c! Check for errors above."
+          exit 1
+          }
+          echo "Compiling other KernelSU objects..."
+          make V=1 O=out KernelSU/kernel/sucompat.o KernelSU/kernel/ksud.o || {
+          echo "ERROR: Failed to compile sucompat.o or ksud.o!"
+          exit 1
+          }
+          ls -l out/KernelSU/kernel/*.o || echo "ERROR: No KernelSU objects generated!"
       
       - name: Build the Kernel
         run: |
