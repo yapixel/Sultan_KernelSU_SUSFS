@@ -115,8 +115,12 @@ jobs:
           COMMIT_COUNT=$(/usr/bin/git rev-list --count HEAD)
           KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
-    
 
+      - name: Apply Missing KSU Functions Patch
+        run: |
+         cd "$CONFIG"
+         cp ../kernel_patches/sultan/add_missing_ksu_functions.patch ./
+         patch -p1 < add_missing_ksu_functions.patch
   
 
       - name: Apply Hide Stuff Patches
