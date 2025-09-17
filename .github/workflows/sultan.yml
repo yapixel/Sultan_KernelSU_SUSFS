@@ -252,7 +252,19 @@ jobs:
             export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
           fi
           make ${{ inputs.codename }}_defconfig -j$(nproc --all)
-          make -j$(nproc --all) || { echo "Build failed, checking undefined symbols..."; find out -name "*.o" | xargs nm -u | grep "ksu_handle_execve_ksud\|ksu_handle_devpts"; exit 1; }
+          make V=1 -j$(nproc --all) || {
+          echo "Build failed, checking undefined symbols..."
+          find out -name "*.o" | xargs nm -u | grep "ksu_handle_execve_ksud\|ksu_handle_devpts\|escape_to_root\|susfs_is_current_ksu_domain\|ksu_get_devpts_sid"
+          echo "Checking if ksu.o was compiled..."
+          ls -l out/KernelSU/kernel/ksu.o || echo "ERROR: ksu.o not found!"
+          echo "Checking if kernelsu.o was compiled..."
+          ls -l out/KernelSU/kernel/kernelsu.o || echo "ERROR: kernelsu.o not found!"
+          echo "Checking google-modules link rule..."
+          find . -type f \( -name "Makefile" -o -name "*.mk" \) -exec grep -A2 -B2 "google-modules/built-in.a" {} \;
+          echo "Checking generated Makefiles in out/..."
+          find out -type f \( -name "Makefile" -o -name "*.mk" \) -exec grep -H "google-modules/built-in.a" {} \;
+          exit 1
+          }
 
       - name: Copy Images
         run: |
