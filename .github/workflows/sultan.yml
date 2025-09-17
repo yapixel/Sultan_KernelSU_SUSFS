@@ -210,7 +210,19 @@ jobs:
           
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+ 
+      - name: Ensure KSU in google-modules Link
+        run: |
+         echo "Checking google-modules Makefile rules..."
+         cd "$CONFIG"
+         if ! grep -q "KernelSU/kernel/kernelsu.o" Makefile; then
+         echo "Adding KernelSU/kernel/kernelsu.o to google-modules..."
+         sed -i '/google-modules\/built-in.a/s/$/ KernelSU\/kernel\/kernelsu.o/' Makefile
+         fi
+         echo "Makefile lines around 2091:"
+         sed -n '2090,2092p' Makefile
 
+    
       - name: Check for KernelSU Functions
         run: |
           echo "Changing to configuration directory: $CONFIG..."
