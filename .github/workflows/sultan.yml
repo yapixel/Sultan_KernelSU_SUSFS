@@ -221,7 +221,19 @@ jobs:
          fi
          echo "Makefile lines around 2091:"
          sed -n '2090,2092p' Makefile
-
+      - name: Verify KSU Makefile
+        run: |
+         echo "Checking KernelSU Makefile..."
+         cd "$CONFIG/KernelSU/kernel"
+         if ! grep -q "obj-\$(CONFIG_KSU) += kernelsu.o" Makefile; then
+         echo "ERROR: kernelsu.o not in Makefile!"
+         exit 1
+         fi
+         if ! grep -q "kernelsu-objs := ksu.o" Makefile; then
+         echo "ERROR: ksu.o not in kernelsu-objs!"
+         exit 1
+         fi
+         cat Makefile
     
       - name: Check for KernelSU Functions
         run: |
