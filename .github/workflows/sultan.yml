@@ -116,12 +116,6 @@ jobs:
           KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
 
-      - name: Apply Missing KSU Functions Patch
-        run: |
-         cd "$CONFIG"
-         cp ../kernel_patches/sultan/add_missing_ksu_functions.patch ./
-         patch -p1 < add_missing_ksu_functions.patch
-  
 
       - name: Apply Hide Stuff Patches
         run: |
@@ -142,7 +136,7 @@ jobs:
           echo "CONFIG_KSU=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
-          echo "CONFIG_SECURITY_SELINUX=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+        
           
           # Add SUSFS configuration settings
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
@@ -204,23 +198,7 @@ jobs:
           echo "CONFIG_IP6_NF_NAT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
-
-      - name: Verify KernelSU Configuration
-        run: |
-          echo "Checking kernel configuration for CONFIG_KSU..."
-          cd "$CONFIG"
-          echo "CONFIG_KSU=y" >> arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_KPROBES_HOOK=n" >> arch/arm64/configs/${{ inputs.codename }}_defconfig
-          make ${{ inputs.codename }}_defconfig O=out -j$(nproc --all)
-          if ! grep -q "CONFIG_KSU=y" out/.config; then
-          echo "ERROR: CONFIG_KSU not enabled in out/.config!"
-          exit 1
-          fi
-          grep CONFIG_KSU out/.config
-          grep CONFIG_KSU_WITH_KPROBES out/.config || echo "CONFIG_KSU_WITH_KPROBES not set"
-          echo "Saving .config for debugging..."
-          cp out/.config config_debug.txt
-
+    
       - name: Run sed and perl Commands
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -229,79 +207,8 @@ jobs:
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
-      - name: Verify KSU Makefile
-        run: |
-         echo "Checking KernelSU Makefile..."
-         cd "$CONFIG/KernelSU/kernel"
-         if ! grep -q "obj-\$(CONFIG_KSU) += kernelsu.o" Makefile; then
-         echo "ERROR: kernelsu.o not in Makefile!"
-         exit 1
-         fi
-         if ! grep -q "kernelsu-objs := ksu.o" Makefile; then
-         echo "ERROR: ksu.o not in kernelsu-objs!"
-         exit 1
-         fi
-         cat Makefile
+
       
-      - name: Ensure KSU in google-modules Link
-        run: |
-         echo "Checking google-modules Makefile rules..."
-         cd "$CONFIG"
-         echo "Searching for google-modules/built-in.a rule..."
-         grep -n "google-modules/built-in.a" Makefile || {
-         echo "WARNING: google-modules/built-in.a not found in $CONFIG/Makefile! Searching subdirectories..."
-         find . -name "*.mk" -exec grep -H "google-modules/built-in.a" {} \;
-         }
-         if ! grep -q "KernelSU/kernel/kernelsu.o" Makefile; then
-         echo "Adding KernelSU/kernel/kernelsu.o to google-modules/built-in.a..."
-         if grep -q "google-modules/built-in.a" Makefile; then
-         sed -i '/google-modules\/built-in.a/s/$/ KernelSU\/kernel\/kernelsu.o/' Makefile
-         else
-         echo "Appending fallback rule for google-modules/built-in.a..."
-         echo "google-modules/built-in.a += KernelSU/kernel/kernelsu.o" >> Makefile
-         fi
-         fi
-         echo "Makefile lines around google-modules rule:"
-         grep -A2 -B2 "google-modules/built-in.a" Makefile || echo "No google-modules rule found in Makefile"
-         echo "Checking line 2091 for context:"
-         sed -n '2090,2092p' Makefile
-    
-      - name: Check for KernelSU Functions
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          echo "Checking for ksu_handle_execve_ksud and ksu_handle_devpts..."
-          grep -r "ksu_handle_execve_ksud" . || echo "ksu_handle_execve_ksud not found"
-          grep -r "ksu_handle_devpts" . || echo "ksu_handle_devpts not found"
-
-      - name: Generate Kernel Config
-        run: |
-         echo "Generating kernel config with O=out..."
-         cd "$CONFIG"
-         echo "CONFIG_KSU=y" >> arch/arm64/configs/${{ inputs.codename }}_defconfig
-         echo "CONFIG_KSU_KPROBES_HOOK=n" >> arch/arm64/configs/${{ inputs.codename }}_defconfig
-         make O=out ${{ inputs.codename }}_defconfig -j$(nproc --all)
-         if ! grep -q "CONFIG_KSU=y" out/.config; then
-         echo "ERROR: CONFIG_KSU not enabled in out/.config!"
-         exit 1
-         fi
-         grep CONFIG_KSU out/.config
-         grep CONFIG_KSU_WITH_KPROBES out/.config || echo "CONFIG_KSU_WITH_KPROBES not set"
-
-      - name: Compile KernelSU Explicitly
-        run: |
-         echo "Attempting to compile KernelSU objects with O=out..."
-         cd "$CONFIG"
-         make O=out V=1 KernelSU/kernel/ksu.o || {
-         echo "ERROR: Failed to compile ksu.c! Check for errors above."
-         exit 1
-          }
-         make O=out V=1 KernelSU/kernel/sucompat.o KernelSU/kernel/ksud.o || {
-         echo "ERROR: Failed to compile sucompat.o or ksud.o!"
-         exit 1
-         }
-         ls -l out/KernelSU/kernel/*.o || echo "ERROR: No KernelSU objects generated!"
-
          
       - name: Build the Kernel
         run: |
@@ -313,19 +220,7 @@ jobs:
             export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
           fi
           make ${{ inputs.codename }}_defconfig -j$(nproc --all)
-          make V=1 -j$(nproc --all) || {
-          echo "Build failed, checking undefined symbols..."
-          find out -name "*.o" | xargs nm -u | grep "ksu_handle_execve_ksud\|ksu_handle_devpts\|escape_to_root\|susfs_is_current_ksu_domain\|ksu_get_devpts_sid"
-          echo "Checking if ksu.o was compiled..."
-          ls -l out/KernelSU/kernel/ksu.o || echo "ERROR: ksu.o not found!"
-          echo "Checking if kernelsu.o was compiled..."
-          ls -l out/KernelSU/kernel/kernelsu.o || echo "ERROR: kernelsu.o not found!"
-          echo "Checking google-modules link rule..."
-          find . -type f \( -name "Makefile" -o -name "*.mk" \) -exec grep -A2 -B2 "google-modules/built-in.a" {} \;
-          echo "Checking generated Makefiles in out/..."
-          find out -type f \( -name "Makefile" -o -name "*.mk" \) -exec grep -H "google-modules/built-in.a" {} \;
-          exit 1
-          }
+          make V=1 -j$(nproc --all) 
 
       - name: Copy Images
         run: |
