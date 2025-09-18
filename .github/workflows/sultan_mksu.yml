@@ -67,6 +67,8 @@ jobs:
           cd "$CONFIG"
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash -s main
+          cd KernelSU
+          git revert -m 1 898e9d4f8ca9b2f46b0c6b36b80a872b5b88d899
 
       - name: Apply SUSFS Patches
         run: |
