@@ -89,8 +89,8 @@ jobs:
       - name: Apply KSU Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          #cd "$CONFIG"
-          cp ../../kernel_patches/sultan/ksu_hooks.patch ./
+          cd "$CONFIG"
+          cp ../kernel_patches/sultan/ksu_hooks.patch ./
           patch -p1 -F 3 < ksu_hooks.patch 
 
       - name: Getting KernelSU Version
