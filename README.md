@@ -53,6 +53,7 @@ To get boot.img format:
 - **KernelSU**: Developed by [tiann](https://github.com/tiann/KernelSU).
 - **MagicKernelSU**: Developed by [5ec1cff](https://github.com/5ec1cff/kernelSU).
 - **SUSFS**: Developed by [simonpunk](https://gitlab.com/simonpunk/susfs4ksu.git).
+- **SUSFS**: Developed by [pershoot](https://gitlab.com/pershoot/susfs4ksu.git).
 - **SUSFS Module**: Developed by [sidex15](https://github.com/sidex15).
 - **Sultan Kernels**: Developed by [kerneltoast](https://github.com/kerneltoast).
 
@@ -68,7 +69,7 @@ If you encounter any issues or need help, feel free to open an issue in this rep
 
 # Disclaimer
 
-Flashing this kernel will void your warranty, and there is always a risk of bricking your device. Please make sure to back up your data and ensure you understand the risks before proceeding.
+Flashing this kernel will void your warranty, and there is always a risk of bricking your device. Please make sure to back up your data and ensure you understand the ribefore proceeding.
 
 **Proceed at your own risk!**
 
