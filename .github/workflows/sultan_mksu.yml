@@ -173,23 +173,6 @@ jobs:
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
-
-      - name: Build Submodules
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          for dir in sched locking printk irq rcu livepatch dma entry module time futex cgroup trace bpf events; do
-            echo "Building $dir..."
-            make -C $dir
-          done
-
-      - name: Check Object Files
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG/out"
-          for file in fork.o exec_domain.o panic.o cpu.o exit.o softirq.o resource.o sysctl.o capability.o ptrace.o user.o signal.o sys.o umh.o workqueue.o pid.o task_work.o extable.o params.o kthread.o sys_ni.o nsproxy.o notifier.o ksysfs.o cred.o reboot.o async.o range.o smpboot.o ucount.o regset.o delayacct.o groups.o sched/built-in.a locking/built-in.a power/built-in.a printk/built-in.a irq/built-in.a rcu/built-in.a livepatch/built-in.a dma/built-in.a entry/built-in.a module/built-in.a kcmp.o freezer.o stacktrace.o time/built-in.a futex/built-in.a smp.o kallsyms.o cgroup/built-in.a configs.o stop_machine.o seccomp.o utsname_sysctl.o taskstats.o tsacct.o tracepoint.o trace/built-in.a irq_work.o cpu_pm.o bpf/built-in.a events/built-in.a jump_label.o context_tracking.o iomem.o; do 
-            [ -f kernel/$file ] || echo "Missing: kernel/$file"; 
-          done
       
       - name: Build the Kernel
         run: |
