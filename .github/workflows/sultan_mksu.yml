@@ -87,12 +87,12 @@ jobs:
           cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
           patch -p1 --fuzz=3 < fix_core_hook.c.patch
 
-      - name: Apply KSU Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          cp ../kernel_patches/sultan/ksu_hooks.patch ./
-          patch -p1 -F 3 < ksu_hooks.patch 
+ #     - name: Apply KSU Hooks
+ #       run: |
+ #         echo "Changing to configuration directory: $CONFIG..."
+ #         cd "$CONFIG"
+ #         cp ../kernel_patches/sultan/ksu_hooks.patch ./
+ #         patch -p1 -F 3 < ksu_hooks.patch 
 
   #    - name: Apply KSU Syscall Hooks
   #      run: |
