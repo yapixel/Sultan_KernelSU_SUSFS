@@ -173,7 +173,16 @@ jobs:
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
-
+      - name: Check Arbitration Directory
+        run: |
+         echo "Changing to configuration directory: $CONFIG..."
+         cd "$CONFIG"
+         if [ -d "google-modules/gpu/arbitration" ]; then
+         echo "Arbitration directory exists"
+         ls -l google-modules/gpu/arbitration
+         else
+         echo "Arbitration directory does not exist"
+         fi
 
       - name: Clean Build Directory
         run: |
