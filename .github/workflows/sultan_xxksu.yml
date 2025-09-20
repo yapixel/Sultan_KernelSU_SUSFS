@@ -57,8 +57,8 @@ jobs:
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
-          #git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://gitlab.com/pershoot/susfs4ksu.git -b "$SUSFS_BRANCH"
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
+          #git clone https://gitlab.com/pershoot/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
@@ -88,8 +88,8 @@ jobs:
       - name: Apply KSU Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          #cd "$CONFIG"
-          cp ../../kernel_patches/xxksu/ksu_hooks.patch ./
+          cd ./KernelSU
+          cp ../kernel_patches/xxksu/ksu_hooks.patch ./
           patch -p1 -F 3 < ksu_hooks.patch 
 
 
