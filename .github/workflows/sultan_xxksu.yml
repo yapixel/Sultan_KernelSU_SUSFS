@@ -85,12 +85,12 @@ jobs:
           cp ../../kernel_patches/xxksu/10_susfs_backslashxx_ksu_patches.patch ./
           patch -p1 < 10_susfs_backslashxx_ksu_patches.patch || true
 
-      - name: Apply KSU Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          cp ../kernel_patches/sultan/ksu_hooks.patch ./
-          patch -p1 -F 3 < ksu_hooks.patch 
+#      - name: Apply KSU Hooks
+#        run: |
+#          echo "Changing to configuration directory: $CONFIG..."
+#          cd "$CONFIG"
+#          cp ../kernel_patches/sultan/ksu_hooks.patch ./
+#          patch -p1 -F 3 < ksu_hooks.patch 
 
 
 #      - name: Apply syscall Hooks
