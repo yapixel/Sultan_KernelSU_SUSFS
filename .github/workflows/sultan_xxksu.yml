@@ -93,6 +93,7 @@ jobs:
       - name: Apply KSU Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
+          cd  "$CONFIG"
           cd ./KernelSU
           cp ../../kernel_patches/xxksu/ksu_hooks.patch ./
           patch -p1 -F 3 < ksu_hooks.patch 
