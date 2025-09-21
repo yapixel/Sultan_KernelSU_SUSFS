@@ -95,11 +95,10 @@ jobs:
         -> https://github.com/sidex15/ksu_module_susfs
         
         Managers:
-        -> https://github.com/5ec1cff/KernelSU/
-        -> https://github.com/tiann/KernelSU/
+        -> https://github.com/backslashxx/KernelSU
         
         Features:
-        [+] MKSU & KernelSU Managers v1.0.5
+        [+] KernelSU Magic Managers v1.0.5
         [+] SUSFS v1.5.9
         [+] Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
