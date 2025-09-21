@@ -60,7 +60,7 @@ jobs:
       kernel_version: "6.1"
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
-  build-kernel-zuma-neutrinoksu:
+  build-kernel-zuma-mksu:
     uses: ./.github/workflows/sultan_neutrinoksu.yml
     secrets: inherit
     needs: generate-tag
@@ -76,7 +76,7 @@ jobs:
     needs:
       - generate-tag
       - build-kernel-zuma-xxksu
-      - build-kernel-zuma-neutrinoksu
+      - build-kernel-zuma-mksu
     if: ${{ inputs.make_release }}
     env:
       GH_TOKEN: ${{ github.token }}
