@@ -61,7 +61,7 @@ jobs:
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
   build-kernel-zuma-mksu:
-    uses: ./.github/workflows/sultan_neutrinoksu.yml
+    uses: ./.github/workflows/sultan_mksu.yml
     secrets: inherit
     needs: generate-tag
     with:
