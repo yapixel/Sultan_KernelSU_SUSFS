@@ -23,7 +23,7 @@ on:
         type: string
   
 jobs:
-  build-kernel-sultan-mksu-susfs:
+  build-kernel-sultan-neutrinoksu-susfs:
     runs-on: ubuntu-latest
     steps:
       - name: Installing dependencies
