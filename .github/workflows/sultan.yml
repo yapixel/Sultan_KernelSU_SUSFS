@@ -83,12 +83,12 @@ jobs:
           cd ./KernelSU-Next
 
           echo "Applying wild SUSFS Fix patches..."
-          curl -Ls https://raw.githubusercontent.com/yapixel/kernel_patches/refs/heads/mksu/next/0001-SuSFS-1.5.9-v6.patch -o ../0001-SuSFS-1.5.9-v6.patch
-          if [ ! -f ../0001-SuSFS-1.5.9-v6.patch ]; then
+          curl -Ls https://raw.githubusercontent.com/yapixel/kernel_patches/refs/heads/mksu/next/0001-SuSFS-1.5.9-v7.patch -o ../0001-SuSFS-1.5.9-v7.patch
+          if [ ! -f ../0001-SuSFS-1.5.9-v7.patch ]; then
             echo "Error: Failed to download SUSFS fix patch"
             exit 1
           fi
-          patch -p1 < ../0001-SuSFS-1.5.9-v6.patch
+          patch -p1 < ../0001-SuSFS-1.5.9-v7.patch
           
           echo "Applying KSU managers patch..."
           curl -Ls https://raw.githubusercontent.com/infectedmushi/kernel_patches/refs/heads/main/next/0001-add-only-WKSU-and-MKSU-managers-and-KSUN.patch -o ../0001-add-only-WKSU-and-MKSU-managers-and-KSUN.patch
