@@ -215,7 +215,7 @@ jobs:
         run: |
           echo "Navigating to AnyKernel3 directory..."
           cd ./AnyKernel3
-          ZIP_NAME="MKSU-${{ env.KSUVER }}-zuma_A16_Sultan_${{ env.LATEST_SULTAN_TAG }}_KSU_SUSFS_${{ inputs.release_tag }}.zip"
+          ZIP_NAME="xxKSU-${{ env.KSUVER }}-zuma_A16_Sultan_${{ env.LATEST_SULTAN_TAG }}_KSU_SUSFS_${{ inputs.release_tag }}.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
