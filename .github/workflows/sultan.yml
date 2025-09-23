@@ -80,7 +80,7 @@ jobs:
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
-          cd ./KernelSU-Next
+          cd ./KernelSU
 
           echo "Applying wild SUSFS Fix patches..."
           curl -Ls https://raw.githubusercontent.com/yapixel/kernel_patches/refs/heads/mksu/next/0001-SuSFS-1.5.9-v7.patch -o ../0001-SuSFS-1.5.9-v7.patch
