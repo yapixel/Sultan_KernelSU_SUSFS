@@ -64,7 +64,7 @@ jobs:
 
         
       
-      - name: Add xxKernelSU
+      - name: Add neutrinoKernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
