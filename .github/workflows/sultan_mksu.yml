@@ -90,12 +90,12 @@ jobs:
           patch -p1 --fuzz=3 < fix_core_hook.c.patch
 
 
-      - name: Apply KSU Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd  "$CONFIG"
-          cp ../kernel_patches/mksu/ksu_hooks_v1.5.patch ./
-          patch -p1 -F 3 < ksu_hooks_v1.5.patch
+ #     - name: Apply KSU Hooks
+ #       run: |
+ #         echo "Changing to configuration directory: $CONFIG..."
+ #         cd  "$CONFIG"
+ #         cp ../kernel_patches/mksu/ksu_hooks_v1.5.patch ./
+ #         patch -p1 -F 3 < ksu_hooks_v1.5.patch
 
   #    - name: Apply KSU Syscall Hooks
   #      run: |
