@@ -1,5 +1,5 @@
 
-name: Sultan neutrinoKSU
+name: Sultan KowSU
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
   actions: write   # Allows triggering actions
@@ -24,7 +24,7 @@ on:
         type: string
   
 jobs:
-  build-kernel-sultan-neutinoksu-susfs:
+  build-kernel-sultan-kowsu-susfs:
     runs-on: ubuntu-latest
     steps:
       - name: Installing dependencies
@@ -64,24 +64,34 @@ jobs:
 
         
       
-      - name: Add neutrinoKernelSU
+      - name: Add KernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          echo "Adding xxKernelSU..."
-          curl -LSs "https://gitlab.tlle.eu.org/alpine/kernelSU/-/raw/main/kernel/setup.sh" | bash -s main
+          
+          echo "Adding KernelSU..."
+          curl -LSs "https://raw.githubusercontent.com/ruaue/KernelSU/master/kernel/setup.sh" | bash -s personal
           
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          echo "Applying core SUSFS patches..."
-          #cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          #cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
+          
+          echo "Applying SUSFS patches..."
+          
+          # Copy SUSFS patches
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
+          cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-          #patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          #patch -p1 < 60_scope-minimized_manual_hooks.patch
+
+          cd ./KernelSU      
+
+          # Change to common directory and apply SUSFS patch
+          cd ..
+          patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          patch -p1 < 60_scope-minimized_manual_hooks.patch
+
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
          
@@ -210,13 +220,13 @@ jobs:
         run: |
           echo "Navigating to AnyKernel3 directory..."
           cd ./AnyKernel3
-          ZIP_NAME="neutrinoKSU-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_KSU_SUSFS-${{ inputs.release_tag }}.zip"
+          ZIP_NAME="KowSU-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_KSU_SUSFS-${{ inputs.release_tag }}.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-${{ inputs.codename }}-neutrinoksu
+          name: kernel-${{ inputs.codename }}-kowsu
           path: |
             *.zip
