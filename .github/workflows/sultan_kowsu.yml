@@ -86,8 +86,8 @@ jobs:
           echo "Apply KSU integration patches"
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
           patch -p1 < 10_enable_susfs_for_ksu.patch || true
-          cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
-          patch -p1 --fuzz=3 < fix_core_hook.c.patch
+        #  cp ../../kernel_patches/mksu/fix_core_hook.c.patch ./
+        #  patch -p1 --fuzz=3 < fix_core_hook.c.patch
 
 
       - name: Apply KSU Hooks
