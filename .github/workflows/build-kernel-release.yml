@@ -71,16 +71,16 @@ jobs:
       kernel_version: "6.1"
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
-  build-kernel-zuma-neutrinoksu:
-    uses: ./.github/workflows/sultan_neutrinoksu.yml
-    secrets: inherit
-    needs: generate-tag
-    with:
-      codename: "zuma"
-      repo: "android_kernel_google_zuma"
-      android_version: "android14"
-      kernel_version: "6.1"
-      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
+#  build-kernel-zuma-neutrinoksu:
+#    uses: ./.github/workflows/sultan_neutrinoksu.yml
+#    secrets: inherit
+#    needs: generate-tag
+#    with:
+#      codename: "zuma"
+#      repo: "android_kernel_google_zuma"
+#      android_version: "android14"
+#      kernel_version: "6.1"
+#      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
   
   build-kernel-zuma-mksu:
     uses: ./.github/workflows/sultan_mksu.yml
@@ -100,7 +100,7 @@ jobs:
       - build-kernel-zuma-xxksu
       - build-kernel-zuma-kowsu
       - build-kernel-zuma-mksu
-      - build-kernel-zuma-neutrinoksu
+    #  - build-kernel-zuma-neutrinoksu
     if: ${{ inputs.make_release }}
     env:
       GH_TOKEN: ${{ github.token }}
