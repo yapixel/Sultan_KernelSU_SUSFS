@@ -70,7 +70,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-{{main}}
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s main
           
       - name: Apply SUSFS Patches
         run: |
@@ -86,8 +86,8 @@ jobs:
           # Apply KSU integration patches
           cd ./KernelSU
     
-          #cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch .
-          #patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch .
+          patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
           
           cp ../../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
