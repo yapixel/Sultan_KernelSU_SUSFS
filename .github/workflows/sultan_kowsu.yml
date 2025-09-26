@@ -107,12 +107,12 @@ jobs:
    #       patch -p1 -F 3 < ksu_hooks.patch
 
 
-      - name: Apply syscall Hooks
+      - name: Apply KSU manual Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch 
+          patch -p1 -F 3 < min_scope_syscall_hooks_v1.5.patch
 
       - name: Getting KernelSU Version
         run: |
