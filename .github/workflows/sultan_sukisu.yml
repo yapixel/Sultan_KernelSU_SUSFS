@@ -85,6 +85,7 @@ jobs:
 
           # Apply KSU integration patches
           cd ./KernelSU
+    
           #cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch .
           #patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
           
@@ -98,8 +99,8 @@ jobs:
           cd  "$CONFIG"
           cp ../SukiSU_patch/hooks/scope_min_manual_hooks_v1.5.patch ./
           patch -p1 -F 3 < scope_min_manual_hooks_v1.5.patch
-  #        cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
-  #        patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
+          cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
+          patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
           
 
 
