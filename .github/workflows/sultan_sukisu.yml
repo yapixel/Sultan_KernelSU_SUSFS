@@ -99,12 +99,12 @@ jobs:
           
 
 
-#      - name: Apply syscall Hooks
-#        run: |
-#          echo "Changing to configuration directory: $CONFIG..."
-#          cd "$CONFIG"
-#          cp ../SukiSU_patch/hooks/syscall_hooks.patch ./
-#          patch -p1 -F 3 < syscall_hooks.patch 
+      - name: Apply syscall Hooks
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          cp ../SukiSU_patch/hooks/syscall_hooks.patch ./
+          patch -p1 -F 3 < syscall_hooks.patch 
 
       - name: Getting KernelSU Version
         run: |
