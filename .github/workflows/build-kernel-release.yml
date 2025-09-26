@@ -105,36 +105,52 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU/MKSU & SUSFS v1.5.9 *TEST BUILD*"
-      RELEASE_NOTES: |
-        This release contains KernelSU and MKSU variants with SUSFS v1.5.9
-        
-        ⚠️ **COMPATIBILITY NOTICE** ⚠️
-        Please ensure compatibility by comparing release dates with official Sultan kernel releases:
-        - Check official Sultan releases: https://github.com/kerneltoast/android_kernel_google_gs201/releases
-        - This build is based on the latest Sultan kernel commits as of build date
-        - Always verify your device's Android version matches the kernel target (Android 14)
-        - Recommended to use kernels released within 30 days of official Sultan updates
-        
-        Module: 
-        -> https://github.com/sidex15/ksu_module_susfs
-        
-        Managers:
-        -> https://github.com/backslashxx/KernelSU
-        
-        Features:
-        [+] KernelSU Magic Managers v1.0.5
-        [+] SUSFS v1.5.9
-        [+] Maphide LineageOS Detections
-        [+] Futile Maphide for jit-zygote-cache Detections
-        [+] Magic Mount Support
-        
-        📅 **Release Date Compatibility Check:**
-        - Built on: $(date '+%Y-%m-%d %H:%M:%S UTC')
-
     steps:
       # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
+
+      # Set Build Date
+      - name: Set Build Date
+        id: set-build-date
+        run: |
+          BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S UTC')
+          echo "build_date=$BUILD_DATE" >> $GITHUB_OUTPUT
+
+      # Define Release Notes with Dynamic Date
+      - name: Define Release Notes
+        id: define-release-notes
+        run: |
+          RELEASE_NOTES=$(cat << 'EOF'
+          This release contains KernelSU and MKSU variants with SUSFS v1.5.9
+          
+          ⚠️ **COMPATIBILITY NOTICE** ⚠️
+          Please ensure compatibility by comparing release dates with official Sultan kernel releases:
+          - Check official Sultan releases: https://github.com/kerneltoast/android_kernel_google_gs201/releases
+          - This build is based on the latest Sultan kernel commits as of build date
+          - Always verify your device's Android version matches the kernel target (Android 14)
+          - Recommended to use kernels released within 30 days of official Sultan updates
+          
+          Module: 
+          -> https://github.com/sidex15/ksu_module_susfs
+          
+          Managers:
+          -> https://github.com/backslashxx/KernelSU
+          
+          Features:
+          [+] KernelSU Magic Managers v1.0.5
+          [+] SUSFS v1.5.9
+          [+] Maphide LineageOS Detections
+          [+] Futile Maphide for jit-zygote-cache Detections
+          [+] Magic Mount Support
+          
+          📅 **Release Date Compatibility Check:**
+          - Built on: ${{ steps.set-build-date.outputs.build_date }}
+          EOF
+          )
+          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       # Download Artifacts
       - name: Download Artifacts
@@ -149,10 +165,11 @@ jobs:
           tag_name: ${{ needs.generate-tag.outputs.new_tag }}  # Use the generated tag for the release
           prerelease: true  # Mark the release as a pre-release
           release_name: ${{ env.RELEASE_NAME }}  # Pass the RELEASE_NAME to the action
-          body: ${{ env.RELEASE_NOTES }}  # Pass the RELEASE_NOTES to the action
+          body: ${{ steps.define-release-notes.outputs.release_notes }}  # Use the dynamically generated release notes
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      # Upload Release Assets Dynamically
       - name: Upload Release Assets Dynamically
         run: |
           # Loop through all files in the downloaded-artifacts directory
