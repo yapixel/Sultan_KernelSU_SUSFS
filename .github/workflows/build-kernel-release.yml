@@ -104,7 +104,7 @@ jobs:
     if: ${{ inputs.make_release }}
     env:
       GH_TOKEN: ${{ github.token }}
-      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU/MKSU & SUSFS v1.5.9 *TEST BUILD*"
+      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU/MKSU & SUSFS v1.5.10 *TEST BUILD*"
     steps:
       # Checkout the code
       - name: Checkout code
@@ -122,7 +122,7 @@ jobs:
         id: define-release-notes
         run: |
           RELEASE_NOTES=$(cat << 'EOF'
-          This release contains KernelSU and MKSU variants with SUSFS v1.5.9
+          This release contains KernelSU and MKSU variants with SUSFS v1.5.10
           
           ⚠️ **COMPATIBILITY NOTICE** ⚠️
           Please ensure compatibility by comparing release dates with official Sultan kernel releases:
