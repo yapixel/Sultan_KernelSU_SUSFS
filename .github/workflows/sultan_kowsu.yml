@@ -70,7 +70,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/yapixel/KowSU/12197/kernel/setup.sh" | bash -s 12197
+          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
           
       - name: Apply SUSFS Patches
         run: |
