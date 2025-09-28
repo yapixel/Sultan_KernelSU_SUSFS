@@ -84,13 +84,13 @@ jobs:
           patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           # Apply KSU integration patches
-          cd ./KernelSU
+          #cd ./KernelSU
     
           #cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch .
           #patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
           
-          cp ../../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 --fuzz=3 < sys.c_fix.patch
+          #cp ../../kernel_patches/sultan/sys.c_fix.patch ./
+          #patch -p1 --fuzz=3 < sys.c_fix.patch
       
 
       - name: Apply KSU Hooks
@@ -126,7 +126,7 @@ jobs:
           cp ../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch 
 
-      - name: Add SUSFS Configuration Settings
+      - name: Ad#d SUSFS Configuration Settings
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
