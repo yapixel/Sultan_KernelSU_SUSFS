@@ -90,8 +90,8 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
-          patch -p1 -F 3 < min_scope_syscall_hooks_v1.5.patch
+          cp ../SukiSU_patch/hooks/scope_min_manual_hooks_v1.5.patch ./
+          patch -p1 -F 3 < scope_min_manual_hooks_v1.5.patch
           #cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
           #patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
           
