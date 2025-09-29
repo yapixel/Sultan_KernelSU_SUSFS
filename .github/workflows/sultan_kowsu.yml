@@ -86,9 +86,9 @@ jobs:
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
           cd ./KernelSU
-          echo "Apply KSU integration patches"
-          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 < 10_enable_susfs_for_ksu.patch || true      
+          #echo "Apply KSU integration patches"
+          #cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          #patch -p1 < 10_enable_susfs_for_ksu.patch || true      
 
           # Change to common directory and apply SUSFS patch
           cd ..
