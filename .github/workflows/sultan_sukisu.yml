@@ -90,8 +90,8 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          cp ../SukiSU_patch/hooks/scope_min_manual_hooks_v1.5.patch ./
-          patch -p1 -F 3 < scope_min_manual_hooks_v1.5.patch
+          cp ../kernel_patches/sukisu/60_scope-minimized_manual_hooks.patch
+          patch -p1 -F 3 < 60_scope-minimized_manual_hooks.patch
           #cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
           #patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
           
@@ -119,7 +119,7 @@ jobs:
           cp ../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch 
 
-      - name: Ad#d SUSFS Configuration Settings
+      - name: Add SUSFS Configuration Settings
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
