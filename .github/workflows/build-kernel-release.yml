@@ -116,7 +116,7 @@ jobs:
     if: ${{ inputs.make_release }}
     env:
       GH_TOKEN: ${{ github.token }}
-      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU/MKSU & SUSFS v1.5.10 *TEST BUILD*"
+      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU/MKSU & SUSFS v1.5.11 *TEST BUILD*"
     steps:
       # Checkout the code
       - name: Checkout code
