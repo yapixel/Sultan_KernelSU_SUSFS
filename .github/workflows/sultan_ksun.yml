@@ -24,7 +24,7 @@ on:
         type: string
   
 jobs:
-  build-kernel-sultan-kowsu-susfs:
+  build-kernel-sultan-ksun-susfs:
     runs-on: ubuntu-latest
     steps:
       - name: Installing dependencies
