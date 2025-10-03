@@ -85,10 +85,13 @@ jobs:
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
-          # cd ./KernelSU
-          # echo "Apply KSU integration patches"
-          # cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          #patch -p1 < 10_enable_susfs_for_ksu.patch || true      
+          cd ./KernelSU
+          echo "Apply KSU integration patches"
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 < 10_enable_susfs_for_ksu.patch || true    
+
+          cp ../../kernel_patches/kowsu/fix_stuff.patch ./
+          patch -p1 < fix_stuff.patch
 
           # Change to common directory and apply SUSFS patch
           cd ..
@@ -130,7 +133,7 @@ jobs:
           cp ../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch 
 
-      - name: Add SUSFS Configuration Settings
+      - name: Add SUSFS Configu ration Settings
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
