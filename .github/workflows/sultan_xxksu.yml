@@ -61,14 +61,16 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-        
+          cd susfs4ksu 
+          git reset 4d3560b12bec5f238fe11f908a246f0ac97e9c27
+          cd ../
       
       - name: Add xxKernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding xxKernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s master
+          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s 1e7b2971eb7de6a420fe3f858442e71cd87635f3
           
       - name: Apply SUSFS Patches
         run: |
@@ -77,7 +79,8 @@ jobs:
           echo "Applying core SUSFS patches..."
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{
           inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
+          cp ../susfs4ksu/kernel_
+          patches/60_scope-minimized_manual_hooks.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
           patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
