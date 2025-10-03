@@ -71,16 +71,6 @@ jobs:
       kernel_version: "6.1"
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
-  build-kernel-zuma-ksun:
-    uses: ./.github/workflows/sultan_ksun.yml
-    secrets: inherit
-    needs: generate-tag
-    with:
-      codename: "zuma"
-      repo: "android_kernel_google_zuma"
-      android_version: "android14"
-      kernel_version: "6.1"
-      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
   
 
@@ -90,7 +80,7 @@ jobs:
       - generate-tag
       - build-kernel-zuma-xxksu
       - build-kernel-zuma-kowsu
-      - build-kernel-zuma-ksun
+      
 
     
     if: ${{ inputs.make_release }}
