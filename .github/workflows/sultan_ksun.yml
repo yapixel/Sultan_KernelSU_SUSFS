@@ -76,7 +76,7 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          
+          ln -s kernelSU-Next kernelSU
           echo "Applying SUSFS patches..."
           
           # Copy SUSFS patches
