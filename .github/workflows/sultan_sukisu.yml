@@ -91,8 +91,8 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          cp ../susfs4ksu/kernel_patches/60_scope_minimized_manual_hooks.patch ./
-          patch -p1 -F 3 < 60_scope_minimized_manual_hooks.patch
+          cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
+          patch -p1 -F 3 < 60_scope-minimized_manual_hooks.patch
           cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
           patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
           
