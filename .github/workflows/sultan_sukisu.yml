@@ -54,16 +54,18 @@ jobs:
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-android14-6.1"
+          SUSFS_BRANCH="gki-android14-6.1-dev"
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
+          git clone https://gitlab.com/pershoot/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-        
+          cd susfs4ksu 
+          git reset --hard 0e19a05277d28182c7b653580117145c53e69e92
+          cd ..
       
       - name: Add KernelSU
         run: |
@@ -78,7 +80,8 @@ jobs:
           cd "$CONFIG"
           echo "Applying core SUSFS patches..."
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{
-          inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
+          inputs.androi
+          d_version }}-${{ inputs.kernel_version }}.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
           patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
