@@ -64,7 +64,7 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
           cd susfs4ksu 
-          git reset --hard 0e19a05277d28182c7b653580117145c53e69e92
+          git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
           cd ..
       
       - name: Add KernelSU
