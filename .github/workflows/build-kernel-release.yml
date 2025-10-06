@@ -10,12 +10,6 @@ on:
       - main
       - master
   workflow_dispatch:
-    inputs:
-      make_release:
-        description: 'Do you want to create a release?'
-        required: true
-        type: boolean
-        default: true
         
 jobs:
   build-kernel-gs201:
@@ -51,14 +45,13 @@ jobs:
         - build-kernel-gs201
         - build-kernel-zuma
         - build-kernel-zumapro
-    if: ${{ inputs.make_release || github.event_name == 'push' }}
     env:
       REPO_OWNER: TheWildJames
       REPO_NAME: Sultan_KernelSU_SUSFS
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_NAME: "Sultan Kernels With KernelSU Next & SUSFS v1.5.10"
+      RELEASE_NAME: "Sultan Kernels With KernelSU Next & SUSFS v1.5.11"
       RELEASE_NOTES: |
-        This release contains KernelSU Next and SUSFS v1.5.10
+        This release contains KernelSU Next and SUSFS v1.5.11
         
         ⚠️ **COMPATIBILITY NOTICE** ⚠️
         Please ensure compatibility by comparing release dates with official Sultan kernel releases
@@ -72,7 +65,7 @@ jobs:
         
         Features:
         [+] Wild KSU & KernelSU-Next Managers
-        [+] SUSFS v1.5.10
+        [+] SUSFS v1.5.11
         [+] Maphide LineageOS Detections
         [+] Futile Maphide for jit-zygote-cache Detections
         [+] Magic Mount Support
@@ -88,7 +81,7 @@ jobs:
             # Fetch the latest tag from GitHub (this is the latest tag based on the GitHub API)
             LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
             if [ -z "$LATEST_TAG" ]; then
-              LATEST_TAG="v1.5.10-r0"  # Default to v1.5.7-0 if no tag exists
+              LATEST_TAG="v1.5.11-r0"  # Default to v1.5.7-0 if no tag exists
             fi
             
             # Increment the suffix (e.g., v1.5.7-0 becomes v1.5.7-1)
