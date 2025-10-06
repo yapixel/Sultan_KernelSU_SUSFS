@@ -58,7 +58,7 @@ jobs:
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
+          git clone https://gitlab.com/pershoot/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
@@ -80,21 +80,22 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Applying core SUSFS patches..."
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
+          cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
           patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          patch -p1 --forward < 60_scope-minimized_manual_hooks.patch
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 --fuzz=3 < sys.c_fix.patch        
-      
+          patch -p1 --fuzz=3 < sys.c_fix.patch
     
       
       - name: Apply KSU Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
-          patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
+          #cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
+          #patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
           #cp ../SukiSU_patch/hooks/scope_min_manual_hooks_v1.5.patch ./
           #patch -p1 -F 3 < scope_min_manual_hooks_v1.5.patch
           cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
