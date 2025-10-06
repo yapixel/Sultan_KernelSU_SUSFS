@@ -64,8 +64,8 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
           cd susfs4ksu 
-          #git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
-          git reset --hard 0e19a05277d28182c7b653580117145c53e69e92
+          git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
+          #git reset --hard 0e19a05277d28182c7b653580117145c53e69e92
           cd ..
       
       - name: Add KernelSU
@@ -94,8 +94,8 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          #cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
-          #patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
+          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
+          patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
           #cp ../SukiSU_patch/hooks/scope_min_manual_hooks_v1.5.patch ./
           #patch -p1 -F 3 < scope_min_manual_hooks_v1.5.patch
           cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
