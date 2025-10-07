@@ -73,6 +73,7 @@ jobs:
           cd "$CONFIG"
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/sidex15/kernelSU-Next/next-susfs/kernel/setup.sh" | bash -s next-susfs
+          
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -88,12 +89,12 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
     
       
-      - name: Apply KSU Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd  "$CONFIG"
-          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
-          patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
+    #  - name: Apply KSU Hooks
+    #    run: |
+    #      echo "Changing to configuration directory: $CONFIG..."
+    #      cd  "$CONFIG"
+    #      cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
+    #      patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
           
           
 
