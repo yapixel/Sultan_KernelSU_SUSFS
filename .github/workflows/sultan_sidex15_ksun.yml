@@ -1,5 +1,5 @@
 
-name: Sultan SukiSU Ultra
+name: Sultan sidex15 KSUN
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
   actions: write   # Allows triggering actions
@@ -59,7 +59,6 @@ jobs:
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/pershoot/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
@@ -73,8 +72,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding KernelSU..."
-          #curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/susfs-main/kernel/setup.sh" | bash -s 8650a9ad57521953f5be48bf4742eb08e1a8af07
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/susfs-main/kernel/setup.sh" | bash -s susfs-main
+          curl -LSs "https://raw.githubusercontent.com/sidex15/kernelSU-Next/next-susfs/kernel/setup.sh" | bash -s next-susfs
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -94,12 +92,9 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          #cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
-          #patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
-          cp ../SukiSU_patch/hooks/scope_min_manual_hooks_v1.5.patch ./
-          patch -p1 -F 3 < scope_min_manual_hooks_v1.5.patch
-          cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
-          patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
+          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
+          patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
+          
           
 
       - name: Getting KernelSU Version
@@ -126,7 +121,7 @@ jobs:
           echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_MANUAL_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
@@ -213,13 +208,13 @@ jobs:
         run: |
           echo "Navigating to AnyKernel3 directory..."
           cd ./AnyKernel3
-          ZIP_NAME="SukiSU-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_KSU_SUSFS-${{ inputs.release_tag }}.zip"
+          ZIP_NAME="KSUN-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_KSU_SUSFS-${{ inputs.release_tag }}.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-${{ inputs.codename }}-sukisu
+          name: kernel-${{ inputs.codename }}-ksun
           path: |
             *.zip
