@@ -99,7 +99,7 @@ jobs:
 
       - name: Getting KernelSU Version
         run: |
-          cd "$CONFIG/KernelSU/kernel"
+          cd "$CONFIG/KernelSU-Next/kernel"
           BASE_VERSION=10200
           COMMIT_COUNT=$(/usr/bin/git rev-list --count HEAD)
           KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
