@@ -90,7 +90,7 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          cp ../../SukiSU_patch/hooks/syscall_hooks.patch ./
+          cp ../SukiSU_patch/hooks/syscall_hooks.patch ./
           patch -p1 --forward -F 3 < syscall_hooks.patch
           
           cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
