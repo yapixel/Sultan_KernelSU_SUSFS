@@ -1,5 +1,5 @@
 
-name: Sultan SukiKSU
+name: Sultan SukiSU-Ultra
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
   actions: write   # Allows triggering actions
@@ -90,10 +90,11 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          cp ../kernel_patches/sukisu/60_scope-minimized_manual_hooks.patch ./
-          patch -p1 -F 3 < 60_scope-minimized_manual_hooks.patch
-          #cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
-          #patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
+          cp ../../SukiSU_patch/hooks/syscall_hooks.patch ./
+          patch -p1 --forward -F 3 < syscall_hooks.patch
+          
+          cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
+          patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
           
 
 
@@ -107,7 +108,7 @@ jobs:
       - name: Getting KernelSU Version
         run: |
           cd "$CONFIG/KernelSU/kernel"
-          BASE_VERSION=10200
+          BASE_VERSION=10700
           COMMIT_COUNT=$(/usr/bin/git rev-list --count HEAD)
           KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
@@ -128,7 +129,7 @@ jobs:
           echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_MANUAL_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          #echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
