@@ -58,12 +58,14 @@ jobs:
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
-          git clone https://gitlab.com/pershoot/susfs4ksu.git -b "$SUSFS_BRANCH"
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-        
-      
+          cd susfs4ksu 
+          git reset --hard de64f31024bbbf4aaad64be3fc6d0cd0417edf60
+          cd ..
+          
       - name: Add KernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
