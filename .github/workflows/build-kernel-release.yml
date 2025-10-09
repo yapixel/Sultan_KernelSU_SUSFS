@@ -93,16 +93,6 @@ jobs:
       kernel_version: "6.1"
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
-  build-kernel-zuma-sukisu:
-    uses: ./.github/workflows/sultan_sukisu.yml
-    secrets: inherit
-    needs: generate-tag
-    with:
-      codename: "zuma"
-      repo: "android_kernel_google_zuma"
-      android_version: "android14"
-      kernel_version: "6.1"
-      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
   trigger-release:
     runs-on: ubuntu-latest
@@ -112,7 +102,7 @@ jobs:
       - build-kernel-zuma-mksu
       - build-kernel-zuma-rksu
       - build-kernel-zuma-sukiksu
-      #- build-kernel-zuma-sukisu
+    
       
     if: ${{ inputs.make_release }}
     env:
