@@ -85,7 +85,7 @@ jobs:
   trigger-release:
     runs-on: ubuntu-latest
     needs:
-      - generate-tag
+      #- generate-tag
       - build-kernel-zuma-xxksu
       - build-kernel-zuma-kowsu
       - build-kernel-zuma-sukisu
