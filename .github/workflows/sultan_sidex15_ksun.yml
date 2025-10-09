@@ -78,24 +78,43 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          echo "Applying core SUSFS patches..."
+          
+          echo "Applying SUSFS patches..."
+          
+          # Copy SUSFS patches
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          #cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-          patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          #patch -p1 --forward < 60_scope-minimized_manual_hooks.patch
+
+          cd ./KernelSU-Next
+          
+          echo "Applying KernelSU-Next SUSFS patches..."
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
+
+          echo "Applying wild SUSFS Fix patches..."
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.11/fix_core_hook.c.patch ./
+          patch -p1 --forward < fix_core_hook.c.patch
+
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.11/fix_sucompat.c.patch ./
+          patch -p1 --forward < fix_sucompat.c.patch
+
+          cp ../../kernel_patches/next/susfs_fix_patches/v1.5.11/fix_kernel_compat.c.patch ./
+          patch -p1 --forward < fix_kernel_compat.c.patch
+          
+          # Change to common directory and apply SUSFS patch
+          cd ..
+          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
-    
-      
-    #  - name: Apply KSU Hooks
-    #    run: |
-    #      echo "Changing to configuration directory: $CONFIG..."
-    #      cd  "$CONFIG"
-    #      cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.4.patch ./
-    #      patch -p1 -F 3 <  min_scope_syscall_hooks_v1.4.patch
-          
+
+      - name: Apply KSU Hooks
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          # Apply additional patch
+          cp ../kernel_patches/next/hooks/syscall_hooks.patch ./
+          patch -p1 -F 3 < syscall_hooks.patch
           
 
       - name: Getting KernelSU Version
