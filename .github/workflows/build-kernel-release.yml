@@ -139,31 +139,31 @@ jobs:
           BUILD_DATE="${{ steps.set-build-date.outputs.build_date }}"
           SUSFS_VERSION="${{ steps.extract-version.outputs.susfs_version }}"
           RELEASE_NOTES=$(cat << EOF
-This release contains KernelSU and MKSU variants with SUSFS $SUSFS_VERSION
-          
-⚠️ **COMPATIBILITY NOTICE** ⚠️
-Please ensure compatibility by comparing release dates with official Sultan kernel releases:
-- Check official Sultan releases: https://github.com/kerneltoast/android_kernel_google_gs201/releases
-- This build is based on the latest Sultan kernel commits as of build date
-- Always verify your device's Android version matches the kernel target (Android 14)
-- Recommended to use kernels released within 30 days of official Sultan updates
-          
-Module: 
--> https://github.com/sidex15/ksu_module_susfs
-          
-Managers:
--> https://github.com/backslashxx/KernelSU
-          
-Features:
-[+] KernelSU Magic Managers v1.0.5
-[+] SUSFS $SUSFS_VERSION
-[+] Maphide LineageOS Detections
-[+] Futile Maphide for jit-zygote-cache Detections
-[+] Magic Mount Support
-          
-📅 **Release Date Compatibility Check:**
-- Built on: $BUILD_DATE
-EOF
+            This release contains KernelSU and MKSU variants with SUSFS $SUSFS_VERSION
+            
+            ⚠️ **COMPATIBILITY NOTICE** ⚠️
+            Please ensure compatibility by comparing release dates with official Sultan kernel releases:
+            - Check official Sultan releases: https://github.com/kerneltoast/android_kernel_google_gs201/releases
+            - This build is based on the latest Sultan kernel commits as of build date
+            - Always verify your device's Android version matches the kernel target (Android 14)
+            - Recommended to use kernels released within 30 days of official Sultan updates
+            
+            Module: 
+            -> https://github.com/sidex15/ksu_module_susfs
+            
+            Managers:
+            -> https://github.com/backslashxx/KernelSU
+            
+            Features:
+            [+] KernelSU Magic Managers v1.0.5
+            [+] SUSFS $SUSFS_VERSION
+            [+] Maphide LineageOS Detections
+            [+] Futile Maphide for jit-zygote-cache Detections
+            [+] Magic Mount Support
+            
+            📅 **Release Date Compatibility Check:**
+            - Built on: $BUILD_DATE
+          EOF
           )
           echo "release_notes<<EOF" >> $GITHUB_OUTPUT
           echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
