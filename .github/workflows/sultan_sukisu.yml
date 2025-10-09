@@ -54,7 +54,7 @@ jobs:
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-android14-6.1"
+          SUSFS_BRANCH="gki-android14-6.1-dev"
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
@@ -86,12 +86,10 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch        
       
 
-      - name: Apply KSU Hooks
+      - name: Apply TracePoint Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd  "$CONFIG"
-          #cp ../SukiSU_patch/hooks/scope_min_manual_hooks_v1.5.patch ./
-          #patch -p1 --forward -F 3 < scope_min_manual_hooks_v1.5.patch
           cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
           patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
           
