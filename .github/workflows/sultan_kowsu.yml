@@ -99,22 +99,23 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
-          
-
-#      - name: Apply KSU Hooks
-#        run: |
-#          echo "Changing to configuration directory: $CONFIG..."
-#          cd  "$CONFIG"
-#          cp ../kernel_patches/xxksu/ksu_hooks.patch ./
-#          patch -p1 -F 3 < ksu_hooks.patch 
-
-
-      - name: Apply syscall Hooks
+       
+      - name: Apply KSU Hook Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          cp ../kernel_patches/sultan/syscall_hooks.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch 
+          echo "Applying manual hook patches..."
+          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
+          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch
+#      
+
+
+   #   - name: Apply syscall Hooks
+   #     run: |
+   #       echo "Changing to configuration directory: $CONFIG..."
+   #       cd "$CONFIG"
+   #       cp ../kernel_patches/sultan/syscall_hooks.patch ./
+   #       patch -p1 -F 3 < syscall_hooks.patch 
 
       - name: Getting KernelSU Version
         run: |
