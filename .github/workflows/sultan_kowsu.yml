@@ -85,9 +85,9 @@ jobs:
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
           cd ./KernelSU
-          echo "Apply KSU integration patches"
-          cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
-          patch -p1 < 20_enable_susfs_for_ksu.patch || true    
+          #echo "Apply KSU integration patches"
+          #cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
+          #patch -p1 < 20_enable_susfs_for_ksu.patch || true    
 
         
 
@@ -101,14 +101,13 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
        
-   #   - name: Apply KSU Hook Patches
-   #     run: |
-   #       echo "Changing to configuration directory: $CONFIG..."
-   #       cd "$CONFIG"
-   #       echo "Applying manual hook patches..."
-   #       cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
-   #       patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch
-#      
+      - name: Apply KSU Hook Patches
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          echo "Applying manual hook patches..."
+          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
+          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch      
 
 
    #   - name: Apply syscall Hooks
