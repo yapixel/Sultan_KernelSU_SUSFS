@@ -54,7 +54,7 @@ jobs:
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-android14-6.1-dev"
+          SUSFS_BRANCH="sultan-shiba-susfs-minimal"
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
@@ -92,10 +92,6 @@ jobs:
           echo "Apply KSU integration patches"   
           cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
           patch -p1 < 20_enable_susfs_for_ksu.patch
-
-         
-
-        
 
           # Change to common directory and apply SUSFS patch
           cd ..
