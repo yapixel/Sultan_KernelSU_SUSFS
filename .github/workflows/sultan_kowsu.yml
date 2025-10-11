@@ -86,13 +86,15 @@ jobs:
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
+          cp ../kernel_patches/kowsu/fix_mount.h.patch ./
+          patch -p1 < fix_mount.h.patch
+
           cd ./KernelSU
           echo "Apply KSU integration patches"   
           cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
           patch -p1 < 20_enable_susfs_for_ksu.patch
 
-          cp ../../kernel_patches/kowsu/fix_mount.h.patch ./
-          patch -p1 < fix_mount.h.patch
+         
 
         
 
