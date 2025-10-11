@@ -92,7 +92,7 @@ jobs:
           patch -p1 < 20_enable_susfs_for_ksu.patch
 
           cp ../../kernel_patches/kowsu/fix_mount.h.patch ./
-          patch -p1 < fix_ mount.h.patch
+          patch -p1 < fix_mount.h.patch
 
         
 
