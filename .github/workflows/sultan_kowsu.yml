@@ -62,9 +62,9 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-          #cd susfs4ksu 
-          #git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
-          #cd ..
+          cd susfs4ksu 
+          git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
+          cd ..
         
           
       - name: Add KernelSU
