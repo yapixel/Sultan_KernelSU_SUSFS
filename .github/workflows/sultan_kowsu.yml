@@ -89,7 +89,7 @@ jobs:
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           cd ./KernelSU
-          #echo "Apply KSU integration patches"   
+          echo "Apply KSU integration patches"   
           #cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
           #patch -p1 < 20_enable_susfs_for_ksu.patch
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
