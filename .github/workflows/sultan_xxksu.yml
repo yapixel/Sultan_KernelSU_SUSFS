@@ -90,8 +90,8 @@ jobs:
 
           # Apply KSU integration patches
           cd ./KernelSU
-          cp ../../kernel_patches/xxksu/20_susfs_backslashxx_ksu_patches.patch ./
-          patch -p1 --forward < 20_susfs_backslashxx_ksu_patches.patch
+          cp ../../kernel_patches/xxksu/10_susfs_backslashxx_ksu_patches.patch ./
+          patch -p1 --forward < 10_susfs_backslashxx_ksu_patches.patch
          
 
       - name: Apply KSU Hooks
