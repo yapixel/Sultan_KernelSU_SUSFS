@@ -96,8 +96,8 @@ jobs:
           patch -p1 < 20_enable_susfs_for_ksu.patch
           cp ../../kernel_patches/kowsu/21_apk_sign.c.patch ./
           patch -p1 < 21_apk_sign.c.patch
-          cp ../../kernel_patches/kowsu/22_core_hook.c.patch ./
-          patch -p1 < 22_core_hook.c.patch
+          #cp ../../kernel_patches/kowsu/22_core_hook.c.patch ./
+          #patch -p1 < 22_core_hook.c.patch
           cp ../../kernel_patches/kowsu/23_ksud.c.patch ./
           patch -p1 < 23_ksud.c.patch
           cp ../../kernel_patches/kowsu/24_sucompat.c.patch ./
