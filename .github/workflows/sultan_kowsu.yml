@@ -90,17 +90,13 @@ jobs:
 
           cd ./KernelSU
           echo "Apply KSU integration patches"   
-          #cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
-          #patch -p1 < 20_enable_susfs_for_ksu.patch
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 < 10_enable_susfs_for_ksu.patch
+          patch -p1 < 10_enable_susfs_for_ksu.patch ||
+          cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu_v1.5.9.patch
+          patch -p1 < 20_enable_susfs_for_ksu_v1.5.9.patch
 
           # Change to common directory and apply SUSFS patch
           cd ../
-        
-          #cp ../kernel_patches/kowsu/fix_mount.h.patch ./
-          #patch -p1 < fix_mount.h.patch
-          
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
