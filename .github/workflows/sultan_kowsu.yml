@@ -63,7 +63,7 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
           cd susfs4ksu 
-          git reset --hard 0ed9845a3f6ed624d55484384f2b414a7527fc3b
+          git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
           cd ..
         
           
@@ -82,6 +82,8 @@ jobs:
           echo "Applying SUSFS patches..."
           
           # Copy SUSFS patches
+
+          
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
