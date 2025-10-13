@@ -92,10 +92,18 @@ jobs:
 
           cd ./KernelSU
           echo "Apply KSU integration patches"   
-          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 < 10_enable_susfs_for_ksu.patch ||
-          cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu_v1.5.9.patch ./
-          patch -p1 < 20_enable_susfs_for_ksu_v1.5.9.patch
+          cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
+          patch -p1 < 20_enable_susfs_for_ksu.patch
+          cp ../../kernel_patches/kowsu/21_apk_sign.c.patch ./
+          patch -p1 < 21_apk_sign.c.patch
+          cp ../../kernel_patches/kowsu/22_core_hook.c.patch ./
+          patch -p1 < 22_core_hook.c.patch
+          cp ../../kernel_patches/kowsu/23_ksud.c.patch ./
+          patch -p1 < 23_ksud.c.patch
+          cp ../../kernel_patches/kowsu/24_sucompat.c.patch ./
+          patch -p1 < 24_sucompat.c.patch
+          cp ../../kernel_patches/kowsu/25_rules.c.patch ./
+          patch -p1 < 25_rules.c.patch
 
           # Change to common directory and apply SUSFS patch
           cd ../
