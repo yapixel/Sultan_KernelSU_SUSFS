@@ -75,8 +75,7 @@ jobs:
           
       - name: Apply SUSFS Patches
         run: |
-          echo "Cha
-          nging to configuration directory: $CONFIG..."
+          echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Applying core SUSFS patches..."
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{
