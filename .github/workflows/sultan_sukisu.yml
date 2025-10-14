@@ -86,12 +86,12 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch        
       
 
-      - name: Apply TracePoint Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd  "$CONFIG"
-          cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
-          patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
+     # - name: Apply TracePoint Hooks
+     #   run: |
+     #     echo "Changing to configuration directory: $CONFIG..."
+     #     cd  "$CONFIG"
+     #     cp ../SukiSU_patch/hooks/sukisu_tracepoint_hooks_v1.1.patch ./
+     #     patch -p1 -F 3 < sukisu_tracepoint_hooks_v1.1.patch
           
 
 
@@ -126,7 +126,7 @@ jobs:
           echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_MANUAL_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          #echo "CONFIG_KSU_TRACEPOINT_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
