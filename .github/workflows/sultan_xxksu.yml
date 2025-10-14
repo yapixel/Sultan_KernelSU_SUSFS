@@ -61,9 +61,9 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-          cd susfs4ksu 
-          git checkout a26ba8380e1d10b2169b8148967c4f5108c2a3f7
-          cd ..
+          #cd susfs4ksu 
+          #git checkout a26ba8380e1d10b2169b8148967c4f5108c2a3f7
+          #cd ..
 
       
       - name: Add KernelSU
@@ -88,10 +88,10 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
-     #     # Apply KSU integration patches
-     #     cd ./KernelSU
-     #     cp ../../kernel_patches/xxksu/20_susfs_backslashxx_ksu_patches.patch ./
-     #     patch -p1 --forward < 20_susfs_backslashxx_ksu_patches.patch
+          # Apply KSU integration patches
+          cd ./KernelSU
+          cp ../../kernel_patches/xxksu/20_susfs_backslashxx_ksu_patches.patch ./
+          patch -p1 --forward < 20_susfs_backslashxx_ksu_patches.patch
          
       - name: Apply Manual Hook Patches
         run: |
@@ -109,12 +109,12 @@ jobs:
  #         patch -p1 -F 3 < ksu_hooks.patch 
 
 
-#      - name: Apply syscall Hooks
-#        run: |
-#          echo "Changing to configuration directory: $CONFIG..."
-#          cd "$CONFIG"
-#          cp ../kernel_patches/sultan/syscall_hooks.patch ./
-#          patch -p1 -F 3 < syscall_hooks.patch 
+      - name: Apply syscall Hooks
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          cp ../kernel_patches/sultan/syscall_hooks.patch ./
+          patch -p1 -F 3 < syscall_hooks.patch 
 
       - name: Getting KernelSU Version
         run: |
