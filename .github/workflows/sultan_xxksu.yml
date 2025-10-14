@@ -85,10 +85,9 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
           # Apply KSU integration patches
-          #cd ./KernelSU
-          #cp ../../kernel_patches/xxksu/20_susfs_backslashxx_ksu_patches.patch ./
-          #patch -p1 --forward < 20_susfs_backslashxx_ksu_patches.patch
-         
+          cd ./KernelSU
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 --forward < 10_enable_susfs_for_ksu.patch         
 
       - name: Apply KSU Hooks
         run: |
