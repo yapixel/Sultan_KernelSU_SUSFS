@@ -71,11 +71,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding xxKernelSU..."
-          git clone https://github.com/backslashxx/KernelSU
-          cd KernelSU 
-          curl https://github.com/tiann/KernelSU/compare/main..1e7b2971eb7de6a420fe3f858442e71cd87635f3.patch | patch -p1
-          cd ..
-          #curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s 1e7b2971eb7de6a420fe3f858442e71cd87635f3
+          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s v1.0.5-47
           
       - name: Apply SUSFS Patches
         run: |
