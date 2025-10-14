@@ -61,10 +61,6 @@ jobs:
           git clone https://github.com/yapixel/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
-
-          cd susfs4ksu 
-          git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
-          cd ..
         
           
       - name: Add KernelSU
@@ -72,7 +68,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"    
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/yapixel/KowSU/12197/kernel/setup.sh" | bash -s 12197
+          curl -LSs "https://raw.githubusercontent.com/KOWX712/kernel/setup.sh" | bash -s master
           
       - name: Apply SUSFS Patches
         run: |
@@ -98,8 +94,6 @@ jobs:
           # Change to common directory and apply SUSFS patch
           cd ../
         
-          #cp ../kernel_patches/kowsu/fix_mount.h.patch ./
-          #patch -p1 < fix_mount.h.patch
           
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
