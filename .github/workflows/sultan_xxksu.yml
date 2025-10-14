@@ -61,17 +61,22 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
+          cd susfs4ksu 
+          git checkout 4bc266b3dcbd325c7a5a800307b8d9d9d4164eab
+          cd ..
+
       
       - name: Add KernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding xxKernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s master
+          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s 1e7b297
           
       - name: Apply SUSFS Patches
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
+          echo "Cha
+          nging to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Applying core SUSFS patches..."
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{
@@ -86,8 +91,8 @@ jobs:
 
           # Apply KSU integration patches
           cd ./KernelSU
-          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 --forward < 10_enable_susfs_for_ksu.patch
+          cp ../../kernel_patches/xxksu/10_susfs_backslashxx_ksu_patches.patch ./
+          patch -p1 --forward < 10_susfs_backslashxx_ksu_patches.patch
          
 
       - name: Apply KSU Hooks
