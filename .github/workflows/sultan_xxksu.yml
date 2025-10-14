@@ -62,7 +62,7 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
           cd susfs4ksu 
-          git checkout 4bc266b3dcbd325c7a5a800307b8d9d9d4164eab
+          git checkout a26ba8380e1d10b2169b8148967c4f5108c2a3f7
           cd ..
 
       
