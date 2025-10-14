@@ -38,10 +38,10 @@ jobs:
           # Fetch the latest tag from this repository
           LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
           if [ -z "$LATEST_TAG" ]; then
-            LATEST_TAG="v1.5.11-r0"  # Default to v1.5.11-r0 if no tag exists
+            LATEST_TAG="v1.5.12-r0"  # Default to v1.5.12-r0 if no tag exists
           fi
           
-          # Increment the suffix (e.g., v1.5.11-r0 becomes v1.5.11-r1)
+          # Increment the suffix (e.g., v1.5.12-r0 becomes v1.5.12-r1)
           NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
           
           # Output the new tag to be used
@@ -83,38 +83,15 @@ jobs:
       kernel_version: "6.1"
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
-  build-kernel-zuma-ksu:
-    uses: ./.github/workflows/sultan_ksu.yml
-    secrets: inherit
-    needs: generate-tag
-    if: ${{ inputs.make_release || inputs.dry_run }}
-    with:
-      codename: "zuma"
-      repo: "android_kernel_google_zuma"
-      android_version: "android14"
-      kernel_version: "6.1"
-      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
-  build-kernel-zuma-mksu:
-    uses: ./.github/workflows/sultan_mksu.yml
-    secrets: inherit
-    needs: generate-tag
-    if: ${{ inputs.make_release || inputs.dry_run }}
-    with:
-      codename: "zuma"
-      repo: "android_kernel_google_zuma"
-      android_version: "android14"
-      kernel_version: "6.1"
-      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
   trigger-release:
     runs-on: ubuntu-latest
     needs:
       - generate-tag
-      - build-kernel-zuma-ksu
       - build-kernel-zuma-xxksu
       - build-kernel-zuma-kowsu
-      - build-kernel-zuma-mksu
+      
     
       
     if: ${{ inputs.make_release && !inputs.dry_run }}
@@ -133,7 +110,7 @@ jobs:
           BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S UTC')
           echo "build_date=$BUILD_DATE" >> $GITHUB_OUTPUT
 
-      # Extract SUSFS version from tag for dynamic notes (e.g., v1.5.11-rX -> v1.5.11)
+      # Extract SUSFS version from tag for dynamic notes (e.g., v1.5.12-rX -> v1.5.12)
       - name: Extract SUSFS Version
         id: extract-version
         run: |
