@@ -73,7 +73,7 @@ jobs:
           echo "Adding xxKernelSU..."
           git clone https://github.com/backslashxx/KernelSU
           cd KernelSU 
-          git checkout 1e7b2971eb7de6a420fe3f858442e71cd87635f3
+          curl https://github.com/tiann/KernelSU/compare/main..1e7b2971eb7de6a420fe3f858442e71cd87635f3.patch | patch -p1
           cd ..
           #curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s 1e7b2971eb7de6a420fe3f858442e71cd87635f3
           
