@@ -132,7 +132,7 @@ jobs:
       - name: Set Release Name
         run: |
           SUSFS_VERSION="${{ steps.extract-version.outputs.susfs_version }}"
-          echo "RELEASE_NAME=*TEST BUILD* Sultan Kernels With KernelSU/MKSU & SUSFS $SUSFS_VERSION *TEST BUILD*" >> $GITHUB_ENV
+          echo "RELEASE_NAME=*TEST BUILD* Sultan Kernels With MKSU & SUSFS_Minimal $SUSFS_VERSION *TEST BUILD*" >> $GITHUB_ENV
 
       # Define Release Notes with Dynamic Date and Version
       - name: Define Release Notes
@@ -141,7 +141,7 @@ jobs:
           BUILD_DATE="${{ steps.set-build-date.outputs.build_date }}"
           SUSFS_VERSION="${{ steps.extract-version.outputs.susfs_version }}"
           RELEASE_NOTES=$(cat << EOF
-            This release contains KernelSU and MKSU variants with SUSFS $SUSFS_VERSION
+            This release contains MKSU with SUSFS_Minimal $SUSFS_VERSION
             
             ⚠️ **COMPATIBILITY NOTICE** ⚠️
             Please ensure compatibility by comparing release dates with official Sultan kernel releases:
@@ -154,10 +154,10 @@ jobs:
             -> https://github.com/sidex15/ksu_module_susfs
             
             Managers:
-            -> https://github.com/backslashxx/KernelSU
+            -> https://github.com/5ec1cff/KernelSU
             
             Features:
-            [+] KernelSU Magic Managers v1.0.5
+            [+] KernelSU Magic Managers
             [+] SUSFS $SUSFS_VERSION
             [+] Maphide LineageOS Detections
             [+] Futile Maphide for jit-zygote-cache Detections
