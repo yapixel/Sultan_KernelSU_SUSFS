@@ -68,7 +68,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"    
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/KOWX712/kernel/setup.sh" | bash -s master
+          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
           
       - name: Apply SUSFS Patches
         run: |
