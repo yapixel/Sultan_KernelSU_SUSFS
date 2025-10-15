@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       codename:
-        required: truest to 
+        required: true
         type: string
       repo:
         required: true
