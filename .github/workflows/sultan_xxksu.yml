@@ -26,10 +26,21 @@ jobs:
   build-kernel-sultan-xxksu-susfs:
     runs-on: ubuntu-latest
     steps:
+    #  - name: Installing dependencies
+    #    run: |
+    #      sudo apt update
+    #      sudo apt install -y gcc-aarch64-linux-gnu
+
       - name: Installing dependencies
         run: |
-          sudo apt update
-          sudo apt install -y gcc-aarch64-linux-gnu
+         sudo apt update
+         sudo apt install -y clang lld llvm gcc-aarch64-linux-gnu binutils-aarch64-linux-gnu \
+         bc bison flex libssl-dev libelf-dev make python3 git lz4
+         echo "CC=clang" >> $GITHUB_ENV
+         echo "LD=ld.lld" >> $GITHUB_ENV
+         echo "AR=llvm-ar" >> $GITHUB_ENV
+         echo "OBJCOPY=llvm-objcopy" >> $GITHUB_ENV
+         echo "OBJDUMP=llvm-objdump" >> $GITHUB_ENV
 
       - name: Set CONFIG Environment Variable
         run: |
@@ -195,7 +206,27 @@ jobs:
           cd "$CONFIG"
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-    
+
+
+      - name: Verify Google Module Archives
+        run: |
+         cd "$CONFIG"
+         echo "Checking for required module archives..."
+         MODULES="amplifiers/cs35l41/built-in.a amplifiers/cs40l26/built-in.a amplifiers/snd_soc_wm_adsp/built-in.a \
+         aoc/built-in.a aoc/alsa/built-in.a aoc/usb/built-in.a bluetooth/broadcom/built-in.a bms/built-in.a \
+         bms/misc/built-in.a display/common/gs_drm/built-in.a display/common/gs_panel/built-in.a \
+         display/samsung/built-in.a fingerprint/goodix/fps_touch_handler/built-in.a gps/broadcom/bcm47765/built-in.a \
+         gpu/mali_kbase/built-in.a gpu/mali_pixel/built-in.a hdcp/samsung/built-in.a lwis/built-in.a nfc/built-in.a \
+         power/mitigation/built-in.a power/reset/built-in.a radio/samsung/s5300/built-in.a soc/gs/built-in.a \
+         touch/common/built-in.a touch/fts/ftm5/built-in.a touch/goodix/built-in.a trusty/built-in.a \
+         uwb/qorvo/qm35/qm35s/built-in.a video/gchips/built-in.a wlan/bcm4398/built-in.a \
+         edgetpu/rio/drivers/edgetpu/rio.o gxp/zuma/gxp.o"
+         for module in $MODULES; do
+         if [ ! -f "google-modules/$module" ]; then
+         echo "Error: Missing module archive: google-modules/$module"
+         exit 1
+         fi
+         done
       
       - name: Build the Kernel
     
