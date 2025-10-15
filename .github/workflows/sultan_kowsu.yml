@@ -85,11 +85,15 @@ jobs:
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           cd ./KernelSU
-          #echo "Apply KSU integration patches"   
-          #cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
-          #patch -p1 < 20_enable_susfs_for_ksu.patch
-          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 < 10_enable_susfs_for_ksu.patch
+          echo "Revert commitbconflict with susfs"
+          cp ../../kernel_patches/kowsu/revert_commit_conflict_with_susfs.patch .
+          patch -p1 < revert_commit_conflict_with_susfs.patch
+          
+          echo "Apply KSU integration patches"   
+          cp ../../kernel_patches/kowsu/enable_susfs_for_kowsu.patch ./
+          patch -p1 < enable_susfs_for_kowsu.patch
+          #cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          #patch -p1 < 10_enable_susfs_for_ksu.patch
 
           # Change to common directory and apply SUSFS patch
           cd ../
