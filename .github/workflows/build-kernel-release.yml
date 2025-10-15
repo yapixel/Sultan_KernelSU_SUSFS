@@ -60,7 +60,7 @@ jobs:
           fi
 
   build-kernel-zuma-xxksu:
-    uses: ./.github/workflows/sultan_xxksu.yml#    
+    uses: ./.github/workflows/sultan_xxksu.yml    
     secrets: inherit
     needs: generate-tag
     if: ${{ inputs.make_release || inputs.dry_run }}
