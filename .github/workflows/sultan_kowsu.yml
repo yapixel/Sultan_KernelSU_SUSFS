@@ -54,8 +54,7 @@ jobs:
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          #SUSFS_BRANCH="gki-android14-6.1-dev"
-          SUSFS_BRANCH="sultan-shiba-susfs-minimal"
+          SUSFS_BRANCH="gki-android14-6.1-dev"
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
@@ -91,10 +90,10 @@ jobs:
           patch -p1 < revert_commit_conflict_with_susfs.patch
           
           echo "Apply KSU integration patches"   
-          #cp ../../kernel_patches/kowsu/enable_susfs_for_kowsu.patch ./
-          #patch -p1 < enable_susfs_for_kowsu.patch
-          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 < 10_enable_susfs_for_ksu.patch || true
+          cp ../../kernel_patches/kowsu/enable_susfs_for_kowsu.patch ./
+          patch -p1 < enable_susfs_for_kowsu.patch
+          #cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          #patch -p1 < 10_enable_susfs_for_ksu.patch || true
 
           # Change to common directory and apply SUSFS patch
           cd ../
@@ -104,13 +103,13 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
        
- #     - name: Apply KSU Hook Patches
- #       run: |
- #         echo "Changing to configuration directory: $CONFIG..."
- #         cd "$CONFIG"
- #         echo "Applying manual hook patches..."
- #         cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
- #         patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch      
+      - name: Apply KSU Hook Patches
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          echo "Applying manual hook patches..."
+          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
+          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch      
 
 
    #   - name: Apply syscall Hooks
