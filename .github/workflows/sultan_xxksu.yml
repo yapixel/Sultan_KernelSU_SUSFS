@@ -211,14 +211,19 @@ jobs:
            
       - name: Build the Kernel
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          echo "Building the kernel..."
-          if [ "${{ inputs.codename }}" == "zumapro" ]; then
-            export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
-          fi
-          make ${{ inputs.codename }}_defconfig -j$(nproc --all)
-          make V=1 -j$(nproc --all) 
+         echo "Changing to configuration directory: $CONFIG..."
+         cd "$CONFIG"
+         echo "Building the kernel..."
+         if [ "${{ inputs.codename }}" == "zumapro" ]; then
+         export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
+         fi
+         make ${{ inputs.codename }}_defconfig -j$(nproc --all)
+         make V=1 -j$(nproc --all) 2>&1 | tee build.log
+         if [ $? -ne 0 ]; then
+         echo "Build failed. Checking for module compilation errors..."
+         grep -i "error:" build.log | grep -E "wlan/bcm4398|edgetpu/rio|gxp/zuma|amplifiers|aoc|bluetooth|display|fingerprint|gps|gpu|hdcp|lwis|nfc|power|radio|soc|touch|trusty|uwb|video"
+         exit 1
+         fi
 
       - name: Copy Images
         run: |
