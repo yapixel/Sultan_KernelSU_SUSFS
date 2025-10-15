@@ -208,59 +208,17 @@ jobs:
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
 
-      - name: Verify Google Module Archives
-        run: |
-         cd "$CONFIG"
-         echo "Checking for required module archives..."
-         MODULES="amplifiers/cs35l41/built-in.a amplifiers/cs40l26/built-in.a amplifiers/snd_soc_wm_adsp/built-in.a \
-         aoc/built-in.a aoc/alsa/built-in.a aoc/usb/built-in.a bluetooth/broadcom/built-in.a bms/built-in.a \
-         bms/misc/built-in.a display/common/gs_drm/built-in.a display/common/gs_panel/built-in.a \
-         display/samsung/built-in.a fingerprint/goodix/fps_touch_handler/built-in.a gps/broadcom/bcm47765/built-in.a \
-         gpu/mali_kbase/built-in.a gpu/mali_pixel/built-in.a hdcp/samsung/built-in.a lwis/built-in.a nfc/built-in.a \
-         power/mitigation/built-in.a power/reset/built-in.a radio/samsung/s5300/built-in.a soc/gs/built-in.a \
-         touch/common/built-in.a touch/fts/ftm5/built-in.a touch/goodix/built-in.a trusty/built-in.a \
-         uwb/qorvo/qm35/qm35s/built-in.a video/gchips/built-in.a wlan/bcm4398/built-in.a \
-         edgetpu/rio/drivers/edgetpu/rio.o gxp/zuma/gxp.o"
-         for module in $MODULES; do
-         if [ ! -f "google-modules/$module" ]; then
-         echo "Error: Missing module archive: google-modules/$module"
-         exit 1
-         fi
-         done
-      
+           
       - name: Build the Kernel
-    
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Building the kernel..."
           if [ "${{ inputs.codename }}" == "zumapro" ]; then
-          export KCFLAGS="-march=armv8.6-a -O2"
+            export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
           fi
-          make ${{ inputs.codename }}_defconfig -j$(nproc --all) 2>&1 | tee -a build.log
-          make V=1 -j4 2>&1 | tee -a build.log
-          if [ $? -ne 0 ]; then
-          echo "Build failed, uploading log..."
-          cat build.log
-          exit 1
-          fi
-          
-      - name: Upload Build Log
-        uses: actions/upload-artifact@v4
-        with:
-         name: build-log
-         path: ${{ env.CONFIG }}/build.log
-           
- #     - name: Build the Kernel
- #       run: |
- #         echo "Changing to configuration directory: $CONFIG..."
- #         cd "$CONFIG"
- #         echo "Building the kernel..."
- #         if [ "${{ inputs.codename }}" == "zumapro" ]; then
- #           export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
- #         fi
- #         make ${{ inputs.codename }}_defconfig -j$(nproc --all)
- #         make V=1 -j$(nproc --all) 
+          make ${{ inputs.codename }}_defconfig -j$(nproc --all)
+          make V=1 -j$(nproc --all) 
 
       - name: Copy Images
         run: |
