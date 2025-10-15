@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       codename:
-        required: true
+        required: truest to 
         type: string
       repo:
         required: true
@@ -94,7 +94,7 @@ jobs:
           #cp ../../kernel_patches/kowsu/enable_susfs_for_kowsu.patch ./
           #patch -p1 < enable_susfs_for_kowsu.patch
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 < 10_enable_susfs_for_ksu.patch
+          patch -p1 < 10_enable_susfs_for_ksu.patch || true
 
           # Change to common directory and apply SUSFS patch
           cd ../
