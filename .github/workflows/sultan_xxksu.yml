@@ -195,17 +195,41 @@ jobs:
           cd "$CONFIG"
           echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-Zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-
+    
+      
       - name: Build the Kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Building the kernel..."
           if [ "${{ inputs.codename }}" == "zumapro" ]; then
-            export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
+          export KCFLAGS="-march=armv8.6-a -O2"  # Downgrade to -O2
           fi
           make ${{ inputs.codename }}_defconfig -j$(nproc --all)
-          make V=1 -j$(nproc --all) 
+          make V=1 -j4 2>&1 | tee build.log
+          if [ $? -ne 0 ]; then
+          echo "Build failed, uploading log..."
+          cat build.log
+          exit 1
+          fi
+          
+      - name: Upload Build Log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+           name: build-log
+           path: ${{ env.CONFIG }}/build.log
+           
+ #     - name: Build the Kernel
+ #       run: |
+ #         echo "Changing to configuration directory: $CONFIG..."
+ #         cd "$CONFIG"
+ #         echo "Building the kernel..."
+ #         if [ "${{ inputs.codename }}" == "zumapro" ]; then
+ #           export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
+ #         fi
+ #         make ${{ inputs.codename }}_defconfig -j$(nproc --all)
+ #         make V=1 -j$(nproc --all) 
 
       - name: Copy Images
         run: |
