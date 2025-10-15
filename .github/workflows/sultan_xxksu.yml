@@ -102,20 +102,20 @@ jobs:
           cp ../../kernel_patches/xxksu/30_susfs_backslashxx_ksu_patches.patch ./
           patch -p1 --forward < 30_susfs_backslashxx_ksu_patches.patch
          
-      - name: Apply Manual Hook Patches
+#      - name: Apply Manual Hook Patches
+#        run: |
+#          echo "Changing to configuration directory: $CONFIG..."
+#          cd "$CONFIG"
+#          echo "Applying manual hook patches..."
+#          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
+#          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch
+          
+      - name: Apply KSU Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          echo "Applying manual hook patches..."
-          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
-          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch
-          
- #     - name: Apply KSU Hooks
- #       run: |
- #         echo "Changing to configuration directory: $CONFIG..."
- #         cd  "$CONFIG"
- #         cp ../kernel_patches/xxksu/ksu_hooks.patch ./
- #         patch -p1 -F 3 < ksu_hooks.patch 
+          cd  "$CONFIG"
+          cp ../kernel_patches/xxksu/ksu_hooks.patch ./
+          patch -p1 -F 3 < ksu_hooks.patch 
 
 
 #      - name: Apply syscall Hooks
