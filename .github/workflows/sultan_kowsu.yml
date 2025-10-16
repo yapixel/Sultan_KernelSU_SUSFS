@@ -192,12 +192,21 @@ jobs:
           echo "CONFIG_IP6_NF_NAT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
+#      - name: Run sed and perl Commands
+#        run: |
+#          echo "Changing to configuration directory: $CONFIG..."
+#          cd "$CONFIG"
+#          echo "Running sed commands..."
+#          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+#          echo "Kernel version suffix set to -g4e52994af56a-ab13829026"
+
       - name: Run sed and perl Commands
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Running sed commands..."
-          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          # Ensure CONFIG_LOCALVERSION is set exactly as desired, overriding any default
+          sed -i '/CONFIG_LOCALVERSION=/c\CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "Kernel version suffix set to -g4e52994af56a-ab13829026"
 
       - name: Build the Kernel
