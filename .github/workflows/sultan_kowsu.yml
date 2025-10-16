@@ -200,21 +200,28 @@ jobs:
 #          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 #          echo "Kernel version suffix set to -g4e52994af56a-ab13829026"
 
+
       - name: Run sed and perl Commands
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Running sed commands..."
-          # Replace the entire CONFIG_LOCALVERSION line with the exact suffix, avoiding + from dirty state
-          #sed -i 's/${LOCALVERSION+set}/set/' ./arch/arm64/scripts/setlocalversion
-          sed -i '/CONFIG_LOCALVERSION=/c\CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          
+          # Replace the entire CONFIG_LOCALVERSION line with the provided local_version
+          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-android14-11-g66e758f7d0c0-ab13748739"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          # Prevent setlocalversion from appending '+' for dirty state
+          sed -i 's/${LOCALVERSION+set}/set/' ./scripts/setlocalversion
+          # Set build timestamp
+          perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul 8 09:17:32 UTC 2025"/' ./init/Makefile
+          echo "Kernel version suffix set to -android14-11-g66e758f7d0c0-ab13748739 without dirty state '+'"
+          echo "Build timestamp set to Tue Jul 8 09:17:32 UTC 2025"
           
       - name: Build the Kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Building the kernel..."
+          # Set SOURCE_DATE_EPOCH for reproducible build timestamp
+          export SOURCE_DATE_EPOCH=$(date -d "Tue Jul 8 09:17:32 UTC 2025" +%s)
           if [ "${{ inputs.codename }}" == "zumapro" ]; then
             export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
           fi
