@@ -205,10 +205,12 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Running sed commands..."
-          # Ensure CONFIG_LOCALVERSION is set exactly as desired, overriding any default
+          # Replace the entire CONFIG_LOCALVERSION line with the exact suffix, avoiding + from dirty state
           sed -i '/CONFIG_LOCALVERSION=/c\CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "Kernel version suffix set to -g4e52994af56a-ab13829026"
-
+          # Optionally, clear any dynamic versioning from scripts/setlocalversion
+          echo > scripts/setlocalversion
+          echo "Kernel version suffix set to -g4e52994af56a-ab13829026 and localversion script cleared"
+          
       - name: Build the Kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
