@@ -206,6 +206,7 @@ jobs:
           cd "$CONFIG"
           echo "Running sed commands..."
           # Replace the entire CONFIG_LOCALVERSION line with the exact suffix, avoiding + from dirty state
+          #sed -i 's/${LOCALVERSION+set}/set/' ./arch/arm64/scripts/setlocalversion
           sed -i '/CONFIG_LOCALVERSION=/c\CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           
           
