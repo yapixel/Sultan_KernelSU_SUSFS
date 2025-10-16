@@ -207,9 +207,7 @@ jobs:
           echo "Running sed commands..."
           # Replace the entire CONFIG_LOCALVERSION line with the exact suffix, avoiding + from dirty state
           sed -i '/CONFIG_LOCALVERSION=/c\CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          # Optionally, clear any dynamic versioning from scripts/setlocalversion
-          echo > scripts/setlocalversion
-          echo "Kernel version suffix set to -g4e52994af56a-ab13829026 and localversion script cleared"
+          
           
       - name: Build the Kernel
         run: |
