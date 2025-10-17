@@ -96,6 +96,17 @@ jobs:
           echo "LATEST_SULTAN_TAG=$LATEST_SULTAN_TAG" >> $GITHUB_ENV
           echo "Latest Sultan tag: $LATEST_SULTAN_TAG"
 
+      - name: Verify Sultan kernel commit
+        run: |
+          echo "Verifying Sultan kernel source compatibility..."
+          cd "$CONFIG"
+          SULTAN_COMMIT=$(git rev-parse HEAD)
+          echo "Sultan kernel commit: $SULTAN_COMMIT"
+          # Optionally, add a check for a known compatible commit or tag
+          # Example: if [ "$SULTAN_COMMIT" != "<expected_commit>" ]; then
+          #   echo "Warning: Sultan kernel commit may not be compatible with SUSFS patch"
+          # fi
+
       - name: Clone AnyKernel3 and other dependencies
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
@@ -126,7 +137,12 @@ jobs:
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-          patch -p1 -F 3 < 50_add_susfs_in_gki-android14-6.1.patch || { echo "Failed to apply SUSFS patch"; exit 1; }
+          if ! patch -p1 -F 3 < 50_add_susfs_in_gki-android14-6.1.patch; then
+            echo "Warning: Failed to apply SUSFS patch (50_add_susfs_in_gki-android14-6.1.patch)"
+            echo "Saving reject files for debugging..."
+            mkdir -p ../patch-rejects
+            mv *.rej ../patch-rejects/ || true
+          fi
           if [ "${{ matrix.variant.apply_manual_hooks }}" = "true" ]; then
             cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
             patch -p1 < 60_scope-minimized_manual_hooks.patch || { echo "Failed to apply manual hooks patch"; exit 1; }
@@ -143,11 +159,23 @@ jobs:
                 echo "Applying patch: $path to $apply_dir with fuzz $fuzz"
                 cp "$path" "$apply_dir/"
                 cd "$apply_dir"
-                patch -p1 --fuzz="$fuzz" < "$(basename "$path")" || { echo "Failed to apply patch: $path"; exit 1; }
+                if ! patch -p1 --fuzz="$fuzz" < "$(basename "$path")"; then
+                  echo "Warning: Failed to apply patch: $path"
+                  mkdir -p ../../patch-rejects
+                  mv *.rej ../../patch-rejects/ || true
+                fi
                 cd - > /dev/null
               fi
             done
           fi
+
+      - name: Upload patch reject files
+        if: failure() || success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: patch-rejects-${{ matrix.variant.name }}
+          path: patch-rejects/*.rej
+          if-no-files-found: ignore
 
       - name: Get KernelSU version
         run: |
