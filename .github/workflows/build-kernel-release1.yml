@@ -1,4 +1,4 @@
-name: Build and Release Sultan Kernels Matrix
+name: Build and Release Sultan Kernels
 
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
@@ -105,7 +105,7 @@ jobs:
       - name: Installing dependencies
         run: |
           sudo apt update
-          sudo apt install -y gcc-aarch64-linux-gnu
+          sudo apt install -y gcc-aarch64-linux-gnu jq  # Ensure jq is installed
 
       - name: Set CONFIG Environment Variable
         run: |
@@ -164,14 +164,15 @@ jobs:
           fi
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
-          # Apply additional patches using a proper loop
+          # Apply additional patches with debug
           if [ -n "${{ toJson(matrix.variant.additional_patches) }}" ]; then
-            for patch in ${{ toJson(matrix.variant.additional_patches) }}; do
-              # Extract path, apply_dir, and fuzz from the JSON string
+            echo "Debug: Additional patches JSON: ${{ toJson(matrix.variant.additional_patches) }}"
+            echo "${{ toJson(matrix.variant.additional_patches) }}" | jq -c '.[]' | while read -r patch; do
               path=$(echo "$patch" | jq -r '.path')
               apply_dir=$(echo "$patch" | jq -r '.apply_dir // "."')
               fuzz=$(echo "$patch" | jq -r '.fuzz // 0')
               if [ -n "$path" ]; then
+                echo "Applying patch: $path to $apply_dir with fuzz $fuzz"
                 cp "$path" "$apply_dir/"
                 cd "$apply_dir"
                 patch -p1 --fuzz="$fuzz" < "$(basename "$path")" || [ "$fuzz" = "0" ]
