@@ -100,6 +100,7 @@ jobs:
                 apply_dir: "."
                 fuzz: 3
             zip_prefix: "KSU"
+    name: build-kernel-${{ matrix.variant.name }}  # Explicitly set job name to variant name
     steps:
       - name: Installing dependencies
         run: |
@@ -163,10 +164,13 @@ jobs:
           fi
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
-          # Only apply additional patches if the array is not empty
+          # Apply additional patches using a proper loop
           if [ -n "${{ toJson(matrix.variant.additional_patches) }}" ]; then
-            for patch in ${{ matrix.variant.additional_patches }}; do
-              IFS=':' read -r path apply_dir fuzz <<< "$patch"
+            for patch in ${{ toJson(matrix.variant.additional_patches) }}; do
+              # Extract path, apply_dir, and fuzz from the JSON string
+              path=$(echo "$patch" | jq -r '.path')
+              apply_dir=$(echo "$patch" | jq -r '.apply_dir // "."')
+              fuzz=$(echo "$patch" | jq -r '.fuzz // 0')
               if [ -n "$path" ]; then
                 cp "$path" "$apply_dir/"
                 cd "$apply_dir"
