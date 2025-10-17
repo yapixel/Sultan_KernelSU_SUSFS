@@ -163,15 +163,18 @@ jobs:
           fi
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
-          for patch in ${{ matrix.variant.additional_patches }}; do
-            IFS=':' read -r path apply_dir fuzz <<< "$patch"
-            if [ -n "$path" ]; then
-              cp "$path" "$apply_dir/"
-              cd "$apply_dir"
-              patch -p1 --fuzz="$fuzz" < "$(basename "$path")" || [ "$fuzz" = "0" ]
-              cd - > /dev/null
-            fi
-          done
+          # Only apply additional patches if the array is not empty
+          if [ -n "${{ toJson(matrix.variant.additional_patches) }}" ]; then
+            for patch in ${{ matrix.variant.additional_patches }}; do
+              IFS=':' read -r path apply_dir fuzz <<< "$patch"
+              if [ -n "$path" ]; then
+                cp "$path" "$apply_dir/"
+                cd "$apply_dir"
+                patch -p1 --fuzz="$fuzz" < "$(basename "$path")" || [ "$fuzz" = "0" ]
+                cd - > /dev/null
+              fi
+            done
+          fi
 
       - name: Getting KernelSU Version
         run: |
