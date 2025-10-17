@@ -1,8 +1,8 @@
 name: Build and Release Sultan Kernels
 
 permissions:
-  contents: write  # Allow writing to repository contents (for pushing tags)
-  actions: write   # Allows triggering actions
+  contents: write
+  actions: write
 
 on:
   workflow_dispatch:
@@ -84,7 +84,6 @@ jobs:
         run: |
           CONFIG="android_kernel_google_zuma"
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
-          echo "CONFIG set to: $CONFIG"
 
       - name: Get latest Sultan tag
         run: |
@@ -95,17 +94,6 @@ jobs:
           fi
           echo "LATEST_SULTAN_TAG=$LATEST_SULTAN_TAG" >> $GITHUB_ENV
           echo "Latest Sultan tag: $LATEST_SULTAN_TAG"
-
-      - name: Verify Sultan kernel commit
-        run: |
-          echo "Verifying Sultan kernel source compatibility..."
-          cd "$CONFIG"
-          SULTAN_COMMIT=$(git rev-parse HEAD)
-          echo "Sultan kernel commit: $SULTAN_COMMIT"
-          # Optionally, add a check for a known compatible commit or tag
-          # Example: if [ "$SULTAN_COMMIT" != "<expected_commit>" ]; then
-          #   echo "Warning: Sultan kernel commit may not be compatible with SUSFS patch"
-          # fi
 
       - name: Clone AnyKernel3 and other dependencies
         run: |
@@ -124,53 +112,46 @@ jobs:
 
       - name: Add KernelSU
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding KernelSU..."
           curl -LSs "${{ matrix.variant.ksu_setup_url }}" | bash -s ${{ matrix.variant.ksu_branch }}
 
       - name: Apply SUSFS patches
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Applying SUSFS patches..."
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
+          # Allow SUSFS patch to fail gracefully and save rejects
           if ! patch -p1 -F 3 < 50_add_susfs_in_gki-android14-6.1.patch; then
-            echo "Warning: Failed to apply SUSFS patch (50_add_susfs_in_gki-android14-6.1.patch)"
-            echo "Saving reject files for debugging..."
+            echo "Warning: SUSFS patch failed - saving rejects for debugging"
             mkdir -p ../patch-rejects
-            mv *.rej ../patch-rejects/ || true
+            mv *.rej ../patch-rejects/ 2>/dev/null || true
           fi
           if [ "${{ matrix.variant.apply_manual_hooks }}" = "true" ]; then
             cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
-            patch -p1 < 60_scope-minimized_manual_hooks.patch || { echo "Failed to apply manual hooks patch"; exit 1; }
+            patch -p1 < 60_scope-minimized_manual_hooks.patch || { echo "Failed to apply manual hooks"; exit 1; }
           fi
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 --fuzz=3 < sys.c_fix.patch || { echo "Failed to apply sys.c_fix patch"; exit 1; }
+          patch -p1 --fuzz=3 < sys.c_fix.patch || { echo "Failed to apply sys.c_fix"; exit 1; }
           if [ -n "${{ toJson(matrix.variant.additional_patches) }}" ]; then
-            echo "Applying additional patches..."
             echo "${{ toJson(matrix.variant.additional_patches) }}" | jq -c '.[]' | while read -r patch; do
               path=$(echo "$patch" | jq -r '.path')
               apply_dir=$(echo "$patch" | jq -r '.apply_dir // "."')
               fuzz=$(echo "$patch" | jq -r '.fuzz // 0')
               if [ -n "$path" ]; then
-                echo "Applying patch: $path to $apply_dir with fuzz $fuzz"
+                echo "Applying: $path"
                 cp "$path" "$apply_dir/"
                 cd "$apply_dir"
-                if ! patch -p1 --fuzz="$fuzz" < "$(basename "$path")"; then
-                  echo "Warning: Failed to apply patch: $path"
-                  mkdir -p ../../patch-rejects
-                  mv *.rej ../../patch-rejects/ || true
-                fi
+                patch -p1 --fuzz="$fuzz" < "$(basename "$path")" || echo "Warning: Failed $path"
                 cd - > /dev/null
               fi
             done
           fi
 
-      - name: Upload patch reject files
-        if: failure() || success()
+      - name: Upload patch rejects (if any)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: patch-rejects-${{ matrix.variant.name }}
@@ -187,16 +168,13 @@ jobs:
 
       - name: Apply hide stuff patches
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           cp ../kernel_patches/69_hide_stuff.patch ./
-          patch -p1 -F 3 < 69_hide_stuff.patch || { echo "Failed to apply hide stuff patch"; exit 1; }
+          patch -p1 -F 3 < 69_hide_stuff.patch || { echo "Failed to apply hide stuff"; exit 1; }
 
       - name: Add SUSFS configuration settings
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          echo "Adding configuration settings to zuma_defconfig..."
           echo "CONFIG_KSU=y" >> ./arch/arm64/configs/zuma_defconfig
           echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./arch/arm64/configs/zuma_defconfig
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/zuma_defconfig
@@ -252,46 +230,35 @@ jobs:
 
       - name: Run sed commands
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          echo "Running sed commands..."
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"/' ./arch/arm64/configs/zuma_defconfig
-          echo "Kernel version suffix set to -g4e52994af56a-ab13829026"
 
       - name: Build the kernel
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          echo "Building the kernel..."
           make zuma_defconfig -j$(nproc --all)
           make V=1 -j$(nproc --all)
 
       - name: Copy images
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          echo "Copying Image.lz4 and concatenating DTB files..."
           cp ./out/arch/arm64/boot/Image.lz4 ../AnyKernel3/Image.lz4
           cat ./out/google-devices/zuma/dts/*.dtb > ../AnyKernel3/dtb
 
       - name: Create ZIP files
         run: |
-          echo "Navigating to AnyKernel3 directory..."
           cd ./AnyKernel3
           ZIP_NAME="${{ matrix.variant.zip_prefix }}-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_SUSFS-${{ steps.generate-tag.outputs.new_tag || 'v1.5.12-r0' }}.zip"
-          echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
       - name: Generate new tag
         id: generate-tag
         run: |
-          echo "Generating new tag..."
           LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
           if [ -z "$LATEST_TAG" ]; then
             LATEST_TAG="v1.5.12-r0"
           fi
           NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
-          echo "New tag: $NEW_TAG"
           echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
       - name: Upload build artifacts
@@ -305,59 +272,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-kernel
     if: ${{ inputs.make_release }}
-    env:
-      GH_TOKEN: ${{ github.token }}
-      RELEASE_NAME: "*TEST BUILD* Sultan Kernels With KernelSU/MKSU & SUSFS v1.5.12 *TEST BUILD*"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Push new tag
         run: |
           NEW_TAG=${{ needs.build-kernel.outputs.new_tag }}
-          echo "Pushing tag: $NEW_TAG"
           git tag $NEW_TAG
           git push origin $NEW_TAG
-
-      - name: Set build date
-        id: set-build-date
-        run: |
-          BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S UTC')
-          echo "build_date=$BUILD_DATE" >> $GITHUB_OUTPUT
-
-      - name: Define release notes
-        id: define-release-notes
-        run: |
-          RELEASE_NOTES=$(cat << 'EOF'
-          This release contains KernelSU and MKSU variants with SUSFS v1.5.12
-          
-          ⚠️ **COMPATIBILITY NOTICE** ⚠️
-          Please ensure compatibility by comparing release dates with official Sultan kernel releases:
-          - Check official Sultan releases: https://github.com/kerneltoast/android_kernel_google_gs201/releases
-          - This build is based on the latest Sultan kernel commits as of build date
-          - Always verify your device's Android version matches the kernel target (Android 14)
-          - Recommended to use kernels released within 30 days of official Sultan updates
-          
-          Module: 
-          -> https://github.com/sidex15/ksu_module_susfs
-          
-          Managers:
-          -> https://github.com/backslashxx/KernelSU
-          
-          Features:
-          [+] KernelSU Magic Managers v1.0.5
-          [+] SUSFS v1.5.12
-          [+] Maphide LineageOS Detections
-          [+] Futile Maphide for jit-zygote-cache Detections
-          [+] Magic Mount Support
-          
-          📅 **Release Date Compatibility Check:**
-          - Built on: ${{ steps.set-build-date.outputs.build_date }}
-          EOF
-          )
-          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
@@ -369,24 +291,36 @@ jobs:
         with:
           tag_name: ${{ needs.build-kernel.outputs.new_tag }}
           prerelease: true
-          release_name: ${{ env.RELEASE_NAME }}
-          body: ${{ steps.define-release-notes.outputs.release_notes }}
+          release_name: "*TEST BUILD* Sultan Kernels With KernelSU/MKSU & SUSFS v1.5.12 *TEST BUILD*"
+          body: |
+            This release contains KernelSU and MKSU variants with SUSFS v1.5.12
+            
+            ⚠️ **COMPATIBILITY NOTICE** ⚠️
+            Please ensure compatibility by comparing release dates with official Sultan kernel releases:
+            - Check official Sultan releases: https://github.com/kerneltoast/android_kernel_google_gs201/releases
+            - This build is based on the latest Sultan kernel commits as of build date
+            - Always verify your device's Android version matches the kernel target (Android 14)
+            - Recommended to use kernels released within 30 days of official Sultan updates
+            
+            Module: https://github.com/sidex15/ksu_module_susfs
+            Managers: https://github.com/backslashxx/KernelSU
+            
+            Features:
+            [+] KernelSU Magic Managers v1.0.5
+            [+] SUSFS v1.5.12
+            [+] Maphide LineageOS Detections
+            [+] Futile Maphide for jit-zygote-cache Detections
+            [+] Magic Mount Support
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Upload release assets
         run: |
           for file in ./downloaded-artifacts/kernel-*/*; do
-              if [ -d "$file" ]; then
-                  continue
+              if [ -f "$file" ]; then
+                echo "Uploading $file..."
+                gh release upload ${{ needs.build-kernel.outputs.new_tag }} "$file"
               fi
-              echo "Uploading $file..."
-              gh release upload ${{ needs.build-kernel.outputs.new_tag }} "$file"
           done
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Display uploaded files
-        run: |
-          echo "GitHub release created with the following files:"
-          ls ./downloaded-artifacts/**/*
