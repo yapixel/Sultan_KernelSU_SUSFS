@@ -1,4 +1,4 @@
-name: Build and Release Sultan Kernels Matrix
+name: Build and Release Sultan Kernels
 
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
@@ -283,14 +283,14 @@ jobs:
         run: |
           echo "Navigating to AnyKernel3 directory..."
           cd ./AnyKernel3
-          ZIP_NAME="${{ matrix.variant.zip_prefix }}-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_KSU_SUSFS-${{ needs.generate-tag.outputs.new_tag }}.zip"
+          ZIP_NAME="${{ matrix.variant.zip_prefix }}-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_SUSFS-${{ needs.generate-tag.outputs.new_tag }}.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-zuma-${{ matrix.variant.name | downcase }}
+          name: kernel-zuma-${{ matrix.variant.name }}
           path: |
             *.zip
 
