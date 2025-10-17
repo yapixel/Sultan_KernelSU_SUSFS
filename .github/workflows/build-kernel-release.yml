@@ -59,17 +59,17 @@ jobs:
             echo "Dry run: Skipping tag creation and push."
           fi
 
-  build-kernel-zuma-xxksu:
-    uses: ./.github/workflows/sultan_xxksu.yml
-    secrets: inherit
-    needs: generate-tag
-    if: ${{ inputs.make_release || inputs.dry_run }}
-    with:
-      codename: "zuma"
-      repo: "android_kernel_google_zuma"
-      android_version: "android14"
-      kernel_version: "6.1"
-      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
+#  build-kernel-zuma-xxksu:
+#    uses: ./.github/workflows/sultan_xxksu.yml
+#    secrets: inherit
+#    needs: generate-tag
+#    if: ${{ inputs.make_release || inputs.dry_run }}
+#    with:
+#      codename: "zuma"
+#      repo: "android_kernel_google_zuma"
+#      android_version: "android14"
+#      kernel_version: "6.1"
+#      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
   build-kernel-zuma-sukisu:
     uses: ./.github/workflows/sultan_sukisu.yml
@@ -103,7 +103,7 @@ jobs:
       - generate-tag
       - build-kernel-zuma-kowsu
       - build-kernel-zuma-sukisu
-      - build-kernel-zuma-xxksu
+      #- build-kernel-zuma-xxksu
       
     
       
@@ -127,7 +127,7 @@ jobs:
       - name: Extract SUSFS Version
         id: extract-version
         run: |
-          SUSFS_VERSION=$(echo "${{ env.NEW_TAG }}" | cut -d'-' -f1 | sed 's/v//')  # e.g., "1.5.11"
+          SUSFS_VERSION=$(echo "${{ env.NEW_TAG }}" | cut -d'-' -f1 | sed 's/v//')  # e.g., "1.5.12"
           echo "susfs_version=v$SUSFS_VERSION" >> $GITHUB_OUTPUT
 
       # Define Release Name dynamically
@@ -156,7 +156,8 @@ jobs:
             -> https://github.com/sidex15/ksu_module_susfs
             
             Managers:
-            -> https://github.com/backslashxx/KernelSU
+            -> https://github.com/KOWX712/KernelSU
+            -> https://github.com/SukiSU-Ultra/SukiSU-Ultra
             
             Features:
             [+] KernelSU Magic Managers v1.0.5
