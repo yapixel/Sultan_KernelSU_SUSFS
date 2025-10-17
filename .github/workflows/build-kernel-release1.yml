@@ -1,4 +1,4 @@
-name: Build and Release Sultan Kernels
+name: Build and Release Sultan Kernels Matrix
 
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
