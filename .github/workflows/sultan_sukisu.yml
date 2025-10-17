@@ -86,7 +86,7 @@ jobs:
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
           cd KernelSU
-          patch -p1 < ../my_changes/fix_list_count_nodes_indent.patch
+          patch -p1 < ../../my_changes/fix_list_count_nodes_indent.patch
           cd ..
           
       - name: Apply SUSFS Patches
