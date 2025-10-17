@@ -180,14 +180,14 @@ jobs:
           echo "CONFIG_ZRAM_GS_WRITEBACK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_DEFAULT_BBR=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
-  #    - name: Add Baseband-guard
-  #      run: |
-  #        echo "Changing to configuration directory: $CONFIG..."
-  #        cd "$CONFIG"
-  #        echo "Adding BBG..."
-  #        wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
-  #        echo "CONFIG_BBG=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-  #        sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/lockdown/lockdown,baseband_guard/ } }' security/Kconfig
+      - name: Add Baseband-guard
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          echo "Adding BBG..."
+          wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
+          echo "CONFIG_BBG=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/lockdown/lockdown,baseband_guard/ } }' security/Kconfig
 
       - name: Run sed and perl Commands
         run: |
