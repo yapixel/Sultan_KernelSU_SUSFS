@@ -174,7 +174,7 @@ jobs:
           echo "CONFIG_IP_SET_LIST_SET=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP6_NF_NAT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KPM=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          echo "CONFIG_KPM=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_MANUAL_SU=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_COMPAT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_ZRAM_GS_WRITEBACK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
