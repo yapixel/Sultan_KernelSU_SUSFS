@@ -14,45 +14,11 @@ on:
         default: true
 
 jobs:
-  generate-tag:
+  build-kernel:
     runs-on: ubuntu-latest
     if: ${{ inputs.make_release }}
     outputs:
       new_tag: ${{ steps.generate-tag.outputs.new_tag }}
-    env:
-      REPO_OWNER: yapixel
-      REPO_NAME: Sultan_KernelSU_SUSFS
-      GH_TOKEN: ${{ github.token }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Generate and Create New Tag
-        id: generate-tag
-        run: |
-          # Fetch the latest tag from this repository
-          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
-          if [ -z "$LATEST_TAG" ]; then
-            LATEST_TAG="v1.5.12-r0"  # Default to v1.5.12-r0 if no tag exists
-          fi
-          
-          # Increment the suffix (e.g., v1.5.12-r0 becomes v1.5.12-r1)
-          NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
-          
-          # Output the new tag to be used
-          echo "New tag: $NEW_TAG"
-          
-          # Set the new tag as output
-          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
-          
-          # Create the tag in the repository
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
-
-  build-kernel:
-    runs-on: ubuntu-latest
-    needs: generate-tag
-    if: ${{ inputs.make_release }}
     strategy:
       matrix:
         variant:
@@ -100,22 +66,27 @@ jobs:
                 apply_dir: "."
                 fuzz: 3
             zip_prefix: "KSU"
-    name: build-kernel-${{ matrix.variant.name }}  # Explicitly set job name to variant name
+    name: build-kernel-${{ matrix.variant.name }}
+    env:
+      REPO_OWNER: yapixel
+      REPO_NAME: Sultan_KernelSU_SUSFS
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Installing dependencies
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y gcc-aarch64-linux-gnu jq  # Ensure jq is installed
+          sudo apt install -y gcc-aarch64-linux-gnu jq
 
-      - name: Set CONFIG Environment Variable
+      - name: Set CONFIG environment variable
         run: |
           CONFIG="android_kernel_google_zuma"
           echo "CONFIG=$CONFIG" >> $GITHUB_ENV
           echo "CONFIG set to: $CONFIG"
 
-      - name: Get Latest Sultan Tag
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Get latest Sultan tag
         run: |
           LATEST_SULTAN_TAG=$(gh api repos/kerneltoast/android_kernel_google_zuma/tags --jq '.[0].name')
           if [ -z "$LATEST_SULTAN_TAG" ]; then
@@ -125,13 +96,11 @@ jobs:
           echo "LATEST_SULTAN_TAG=$LATEST_SULTAN_TAG" >> $GITHUB_ENV
           echo "Latest Sultan tag: $LATEST_SULTAN_TAG"
 
-      - name: Clone AnyKernel3 and Other Dependencies
+      - name: Clone AnyKernel3 and other dependencies
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-zuma"
           SUSFS_BRANCH="gki-android14-6.1-dev"
-          echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
-          echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone ${{ matrix.variant.susfs_repo }} -b "$SUSFS_BRANCH"
           if [ -n "${{ matrix.variant.susfs_commit }}" ]; then
@@ -149,7 +118,7 @@ jobs:
           echo "Adding KernelSU..."
           curl -LSs "${{ matrix.variant.ksu_setup_url }}" | bash -s ${{ matrix.variant.ksu_branch }}
 
-      - name: Apply SUSFS Patches
+      - name: Apply SUSFS patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
@@ -157,16 +126,15 @@ jobs:
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-          patch -p1 -F 3 < 50_add_susfs_in_gki-android14-6.1.patch || true
+          patch -p1 -F 3 < 50_add_susfs_in_gki-android14-6.1.patch || { echo "Failed to apply SUSFS patch"; exit 1; }
           if [ "${{ matrix.variant.apply_manual_hooks }}" = "true" ]; then
             cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
-            patch -p1 < 60_scope-minimized_manual_hooks.patch
+            patch -p1 < 60_scope-minimized_manual_hooks.patch || { echo "Failed to apply manual hooks patch"; exit 1; }
           fi
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 --fuzz=3 < sys.c_fix.patch
-          # Apply additional patches with debug
+          patch -p1 --fuzz=3 < sys.c_fix.patch || { echo "Failed to apply sys.c_fix patch"; exit 1; }
           if [ -n "${{ toJson(matrix.variant.additional_patches) }}" ]; then
-            echo "Debug: Additional patches JSON: ${{ toJson(matrix.variant.additional_patches) }}"
+            echo "Applying additional patches..."
             echo "${{ toJson(matrix.variant.additional_patches) }}" | jq -c '.[]' | while read -r patch; do
               path=$(echo "$patch" | jq -r '.path')
               apply_dir=$(echo "$patch" | jq -r '.apply_dir // "."')
@@ -175,13 +143,13 @@ jobs:
                 echo "Applying patch: $path to $apply_dir with fuzz $fuzz"
                 cp "$path" "$apply_dir/"
                 cd "$apply_dir"
-                patch -p1 --fuzz="$fuzz" < "$(basename "$path")" || [ "$fuzz" = "0" ]
+                patch -p1 --fuzz="$fuzz" < "$(basename "$path")" || { echo "Failed to apply patch: $path"; exit 1; }
                 cd - > /dev/null
               fi
             done
           fi
 
-      - name: Getting KernelSU Version
+      - name: Get KernelSU version
         run: |
           cd "$CONFIG/KernelSU${{ matrix.variant.name == 'KSUN' && '-Next' || '' }}/kernel"
           BASE_VERSION=10200
@@ -189,72 +157,74 @@ jobs:
           KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
 
-      - name: Apply Hide Stuff Patches
+      - name: Apply hide stuff patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           cp ../kernel_patches/69_hide_stuff.patch ./
-          patch -p1 -F 3 < 69_hide_stuff.patch
+          patch -p1 -F 3 < 69_hide_stuff.patch || { echo "Failed to apply hide stuff patch"; exit 1; }
 
-      - name: Add SUSFS Configuration Settings
+      - name: Add SUSFS configuration settings
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding configuration settings to zuma_defconfig..."
-          echo "CONFIG_KSU=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_TMPFS_XATTR=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_NF_TARGET_TTL=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP6_NF_TARGET_HL=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP6_NF_MATCH_HL=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_TCP_CONG_BBR=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_NET_SCH_FQ=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_TCP_CONG_BIC=n" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_TCP_CONG_HTCP=n" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_BPF_STREAM_PARSER=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_NETFILTER_XT_SET=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_MAX=65534" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_BITMAP_IP=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_BITMAP_IPMAC=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_BITMAP_PORT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_IP=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_IPMARK=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_IPPORT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_IPPORTIP=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_IPPORTNET=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_IPMAC=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_MAC=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_NETPORTNET=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_NET=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_NETNET=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_NETPORT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_HASH_NETIFACE=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP_SET_LIST_SET=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP6_NF_NAT=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> ./arch/arm64/configs/zuma_defconfig
+          cat << EOF >> ./arch/arm64/configs/zuma_defconfig
+CONFIG_KSU=y
+CONFIG_KSU_KPROBES_HOOK=n
+CONFIG_KSU_SUSFS=y
+CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y
+CONFIG_KSU_SUSFS_SUS_PATH=y
+CONFIG_KSU_SUSFS_SUS_MOUNT=y
+CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y
+CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y
+CONFIG_KSU_SUSFS_SUS_KSTAT=y
+CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n
+CONFIG_KSU_SUSFS_TRY_UMOUNT=y
+CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y
+CONFIG_KSU_SUSFS_SPOOF_UNAME=y
+CONFIG_KSU_SUSFS_ENABLE_LOG=y
+CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y
+CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y
+CONFIG_KSU_SUSFS_OPEN_REDIRECT=y
+CONFIG_KSU_SUSFS_SUS_SU=n
+CONFIG_TMPFS_XATTR=y
+CONFIG_TMPFS_POSIX_ACL=y
+CONFIG_IP_NF_TARGET_TTL=y
+CONFIG_IP6_NF_TARGET_HL=y
+CONFIG_IP6_NF_MATCH_HL=y
+CONFIG_TCP_CONG_ADVANCED=y
+CONFIG_TCP_CONG_BBR=y
+CONFIG_NET_SCH_FQ=y
+CONFIG_TCP_CONG_BIC=n
+CONFIG_TCP_CONG_WESTWOOD=n
+CONFIG_TCP_CONG_HTCP=n
+CONFIG_BPF_STREAM_PARSER=y
+CONFIG_NETFILTER_XT_MATCH_ADDRTYPE=y
+CONFIG_NETFILTER_XT_SET=y
+CONFIG_IP_SET=y
+CONFIG_IP_SET_MAX=65534
+CONFIG_IP_SET_BITMAP_IP=y
+CONFIG_IP_SET_BITMAP_IPMAC=y
+CONFIG_IP_SET_BITMAP_PORT=y
+CONFIG_IP_SET_HASH_IP=y
+CONFIG_IP_SET_HASH_IPMARK=y
+CONFIG_IP_SET_HASH_IPPORT=y
+CONFIG_IP_SET_HASH_IPPORTIP=y
+CONFIG_IP_SET_HASH_IPPORTNET=y
+CONFIG_IP_SET_HASH_IPMAC=y
+CONFIG_IP_SET_HASH_MAC=y
+CONFIG_IP_SET_HASH_NETPORTNET=y
+CONFIG_IP_SET_HASH_NET=y
+CONFIG_IP_SET_HASH_NETNET=y
+CONFIG_IP_SET_HASH_NETPORT=y
+CONFIG_IP_SET_HASH_NETIFACE=y
+CONFIG_IP_SET_LIST_SET=y
+CONFIG_IP6_NF_NAT=y
+CONFIG_IP6_NF_TARGET_MASQUERADE=y
+EOF
 
-      - name: Run sed and perl Commands
+      - name: Run sed commands
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
@@ -262,40 +232,43 @@ jobs:
           sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-g4e52994af56a-ab13829026"/' ./arch/arm64/configs/zuma_defconfig
           echo "Kernel version suffix set to -g4e52994af56a-ab13829026"
 
-      - name: Build the Kernel
+      - name: Build the kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Building the kernel..."
-          if [ "zuma" == "zumapro" ]; then
-            export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
-          fi
           make zuma_defconfig -j$(nproc --all)
           make V=1 -j$(nproc --all)
 
-      - name: Copy Images
+      - name: Copy images
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Copying Image.lz4 and concatenating DTB files..."
           cp ./out/arch/arm64/boot/Image.lz4 ../AnyKernel3/Image.lz4
-          if [ "zuma" == "gs201" ]; then
-            cat ./out/google-devices/gs201/dts/*.dtb > ../AnyKernel3/dtb
-          elif [ "zuma" == "zuma" ]; then
-            cat ./out/google-devices/zuma/dts/*.dtb > ../AnyKernel3/dtb
-          elif [ "zuma" == "zumapro" ]; then
-            cat ./out/google-devices/zumapro/dts/*.dtb > ../AnyKernel3/dtb
-          fi
+          cat ./out/google-devices/zuma/dts/*.dtb > ../AnyKernel3/dtb
 
-      - name: Create ZIP Files for Different Formats
+      - name: Create ZIP files
         run: |
           echo "Navigating to AnyKernel3 directory..."
           cd ./AnyKernel3
-          ZIP_NAME="${{ matrix.variant.zip_prefix }}-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_SUSFS-${{ needs.generate-tag.outputs.new_tag }}.zip"
+          ZIP_NAME="${{ matrix.variant.zip_prefix }}-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_SUSFS-${{ steps.generate-tag.outputs.new_tag || 'v1.5.12-r0' }}.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
-      - name: Upload Build Artifacts
+      - name: Generate new tag
+        id: generate-tag
+        run: |
+          echo "Generating new tag..."
+          LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
+          if [ -z "$LATEST_TAG" ]; then
+            LATEST_TAG="v1.5.12-r0"
+          fi
+          NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
+          echo "New tag: $NEW_TAG"
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: kernel-zuma-${{ matrix.variant.name }}
@@ -304,9 +277,7 @@ jobs:
 
   trigger-release:
     runs-on: ubuntu-latest
-    needs:
-      - generate-tag
-      - build-kernel
+    needs: build-kernel
     if: ${{ inputs.make_release }}
     env:
       GH_TOKEN: ${{ github.token }}
@@ -315,13 +286,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set Build Date
+      - name: Push new tag
+        run: |
+          NEW_TAG=${{ needs.build-kernel.outputs.new_tag }}
+          echo "Pushing tag: $NEW_TAG"
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+
+      - name: Set build date
         id: set-build-date
         run: |
           BUILD_DATE=$(date '+%Y-%m-%d %H:%M:%S UTC')
           echo "build_date=$BUILD_DATE" >> $GITHUB_OUTPUT
 
-      - name: Define Release Notes
+      - name: Define release notes
         id: define-release-notes
         run: |
           RELEASE_NOTES=$(cat << 'EOF'
@@ -355,34 +333,34 @@ jobs:
           echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Download Artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: ./downloaded-artifacts
 
-      - name: Create GitHub Release
+      - name: Create GitHub release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ needs.generate-tag.outputs.new_tag }}
+          tag_name: ${{ needs.build-kernel.outputs.new_tag }}
           prerelease: true
           release_name: ${{ env.RELEASE_NAME }}
           body: ${{ steps.define-release-notes.outputs.release_notes }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Upload Release Assets Dynamically
+      - name: Upload release assets
         run: |
           for file in ./downloaded-artifacts/kernel-*/*; do
               if [ -d "$file" ]; then
                   continue
               fi
               echo "Uploading $file..."
-              gh release upload ${{ needs.generate-tag.outputs.new_tag }} "$file"
+              gh release upload ${{ needs.build-kernel.outputs.new_tag }} "$file"
           done
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Display Files Uploaded
+      - name: Display uploaded files
         run: |
           echo "GitHub release created with the following files:"
           ls ./downloaded-artifacts/**/*
