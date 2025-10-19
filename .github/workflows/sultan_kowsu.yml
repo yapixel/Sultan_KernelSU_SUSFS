@@ -146,6 +146,7 @@ jobs:
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          echo "CONFIG_KSU_SUSFS_SUS_MAP=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
@@ -184,7 +185,7 @@ jobs:
           echo "CONFIG_IP_SET_HASH_IPPORTNET=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP_SET_HASH_IPMAC=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP_SET_HASH_MAC=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_IP_SET_HASH_NETPORTNET=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          echo "CONFIG_IP_SET_HASH_NETPORTNET=y" >> ./arch/arm64/c"onfigs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP_SET_HASH_NET=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP_SET_HASH_NETNET=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP_SET_HASH_NETPORT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
