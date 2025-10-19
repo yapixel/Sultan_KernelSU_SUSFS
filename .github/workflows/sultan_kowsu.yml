@@ -135,7 +135,7 @@ jobs:
           cp ../kernel_patches/69_hide_stuff.patch ./
           patch -p1 -F 3 < 69_hide_stuff.patch 
 
-      - name: Add SUSFS Configu ration Settings
+      - name: Add SUSFS Configuration Settings
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
