@@ -79,9 +79,9 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
           git clone https://gist.github.com/87371b65f283bb031d80e55b16b6d7ad.git my_changes
 
-          cd susfs4ksu
-          git checkout f16560ce8263fbfa9b2f259e9531f72d6fda4e3f
-          cd ../
+          #cd susfs4ksu
+          #git checkout f16560ce8263fbfa9b2f259e9531f72d6fda4e3f
+          #cd ../
       
       - name: Add KernelSU
         run: |
