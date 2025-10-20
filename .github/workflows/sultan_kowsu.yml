@@ -64,7 +64,7 @@ jobs:
           git clone https://github.com/KOWX712/files.git kowsu_patches
 
           cd susfs4ksu 
-          git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
+          git checkout  646cfabce9d5dba5b806e9cbe2c198128ebd0e69
           cd ..
         
           
