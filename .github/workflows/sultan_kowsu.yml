@@ -82,8 +82,6 @@ jobs:
           echo "Applying SUSFS patches..."
           
           # Copy SUSFS patches
-
-          
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
@@ -91,20 +89,14 @@ jobs:
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           cd ./KernelSU
+          echo "Revert commitbconflict with susfs"
+          cp ../../kowsu_patches/KowSU/revert_commit_conflict_with_susfs.patch .
+          patch -p1 < revert_commit_conflict_with_susfs.patch
+          
           echo "Apply KSU integration patches"   
-          cp ../../kernel_patches/kowsu/20_enable_susfs_for_ksu.patch ./
-          patch -p1 < 20_enable_susfs_for_ksu.patch
-          cp ../../kernel_patches/kowsu/21_apk_sign.c.patch ./
-          patch -p1 < 21_apk_sign.c.patch
-          cp ../../kernel_patches/kowsu/22_core_hook.c.patch ./
-          patch -p1 < 22_core_hook.c.patch
-          cp ../../kernel_patches/kowsu/23_ksud.c.patch ./
-          patch -p1 < 23_ksud.c.patch
-          cp ../../kernel_patches/kowsu/24_sucompat.c.patch ./
-          patch -p1 < 24_sucompat.c.patch
-          cp ../../kernel_patches/kowsu/25_rules.c.patch ./
-          patch -p1 < 25_rules.c.patch
-
+          cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
+          patch -p1 < enable_susfs_for_kowsu.patch
+         
           # Change to common directory and apply SUSFS patch
           cd ../
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
@@ -118,14 +110,15 @@ jobs:
           echo "Applying manual hook patches..."
           cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
           patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch      
+      
 
 
-      - name: Apply syscall Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          cp ../kernel_patches/sultan/syscall_hooks.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch 
+#      - name: Apply syscall Hooks
+#        run: |
+#          echo "Changing to configuration directory: $CONFIG..."
+#          cd "$CONFIG"
+#          cp ../kernel_patches/sultan/syscall_hooks.patch ./
+#          patch -p1 -F 3 < syscall_hooks.patch 
 
       - name: Getting KernelSU Version
         run: |
