@@ -59,8 +59,8 @@ jobs:
             echo "Dry run: Skipping tag creation and push."
           fi
 
-  build-kernel-zuma-xxksu:
-    uses: ./.github/workflows/sultan_xxksu.yml    
+  build-kernel-zuma-kowsu:
+    uses: ./.github/workflows/sultan_kowsu.yml    
     secrets: inherit
     needs: generate-tag
     if: ${{ inputs.make_release || inputs.dry_run }}
@@ -101,7 +101,7 @@ jobs:
     needs:
       - generate-tag
       #- build-kernel-zuma-ksu
-      - build-kernel-zuma-xxksu
+      - build-kernel-zuma-kowsu
       - build-kernel-zuma-mksu
     
       
