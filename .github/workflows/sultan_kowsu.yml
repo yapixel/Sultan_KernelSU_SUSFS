@@ -60,7 +60,8 @@ jobs:
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
-          git clone https://github.com/KOWX712/files.git kernel_patches
+          git clone https://github.com/yapixel/kernel_patches.git 
+          git clone https://github.com/KOWX712/files.git kowsu_patches
           
       - name: Add KernelSU
         run: |
@@ -86,11 +87,11 @@ jobs:
 
           cd ./KernelSU
           echo "Revert commitbconflict with susfs"
-          cp ../../kernel_patches/KowSU/revert_commit_conflict_with_susfs.patch .
+          cp ../../kowsu_patches/KowSU/revert_commit_conflict_with_susfs.patch .
           patch -p1 < revert_commit_conflict_with_susfs.patch
           
           echo "Apply KSU integration patches"   
-          cp ../../kernel_patches/KowSU/enable_susfs_for_kowsu.patch ./
+          cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
           patch -p1 < enable_susfs_for_kowsu.patch
          
           # Change to common directory and apply SUSFS patch
