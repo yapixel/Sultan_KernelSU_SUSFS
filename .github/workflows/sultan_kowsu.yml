@@ -61,6 +61,7 @@ jobs:
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
+          git clone https://github.com/KOWX712/files.git kowsu_patches
 
           cd susfs4ksu 
           git reset --hard a26ba8380e1d10b2169b8148967c4f5108c2a3f7
