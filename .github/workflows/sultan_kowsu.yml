@@ -64,7 +64,7 @@ jobs:
           git clone https://github.com/KOWX712/files.git kowsu_patches
 
           cd susfs4ksu
-          git checkout 0f77dfb8b6e5ca2a0ab82685c1be93c9ffc2ab3e
+          git checkout 72aef829edfad85b92e14886f91f39ea5c5c13c9
           cd ../
           
       - name: Add KernelSU
