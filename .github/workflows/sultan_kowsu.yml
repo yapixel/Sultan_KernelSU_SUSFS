@@ -95,8 +95,12 @@ jobs:
           patch -p1 < revert_commit_conflict_with_susfs.patch
           
           echo "Apply KSU integration patches"   
-          cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
-          patch -p1 < enable_susfs_for_kowsu.patch
+          #cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
+          #patch -p1 < enable_susfs_for_kowsu.patch
+
+
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
          
           # Change to common directory and apply SUSFS patch
           cd ../
