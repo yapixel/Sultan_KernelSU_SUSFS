@@ -59,25 +59,23 @@ jobs:
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
-
+          git clone https://github.com/KOWX712/files.git kerne_patches
           
       - name: Add KernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"    
           echo "Adding KernelSU..."
-          #curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
-          git clone https://github.com/yapixel/KowSU KernelSU -b susfs-master
+          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
+          #git clone https://github.com/yapixel/KowSU KernelSU -b susfs-master
           
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           
-          echo "Applying SUS
-          FS patches..."
+          echo "Applying SUSFS patches..."
           
           # Copy SUSFS patches
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
@@ -87,20 +85,16 @@ jobs:
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           cd ./KernelSU
-          #echo "Revert commitbconflict with susfs"
-          #cp ../../kernel_patches/kowsu/revert_commit_conflict_with_susfs.patch .
-          #patch -p1 < revert_commit_conflict_with_susfs.patch
+          echo "Revert commitbconflict with susfs"
+          cp ../../kernel_patches/KowSU/revert_commit_conflict_with_susfs.patch .
+          patch -p1 < revert_commit_conflict_with_susfs.patch
           
-          #echo "Apply KSU integration patches"   
-          #cp ../../kernel_patches/kowsu/enable_susfs_for_kowsu.patch ./
-          #patch -p1 < enable_susfs_for_kowsu.patch
-          #cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          #patch -p1 < 10_enable_susfs_for_ksu.patch || true
-
+          echo "Apply KSU integration patches"   
+          cp ../../kernel_patches/KowSU/enable_susfs_for_kowsu.patch ./
+          patch -p1 < enable_susfs_for_kowsu.patch
+         
           # Change to common directory and apply SUSFS patch
           cd ../
-        
-          
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
