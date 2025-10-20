@@ -59,17 +59,17 @@ jobs:
             echo "Dry run: Skipping tag creation and push."
           fi
 
-  build-kernel-zuma-kowsu:
-    uses: ./.github/workflows/sultan_kowsu.yml    
-    secrets: inherit
-    needs: generate-tag
-    if: ${{ inputs.make_release || inputs.dry_run }}
-    with:
-      codename: "zuma"
-      repo: "android_kernel_google_zuma"
-      android_version: "android14"
-      kernel_version: "6.1"
-      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
+#  build-kernel-zuma-kowsu:
+#    uses: ./.github/workflows/sultan_kowsu.yml    
+#    secrets: inherit
+#    needs: generate-tag
+#    if: ${{ inputs.make_release || inputs.dry_run }}
+#    with:
+#      codename: "zuma"
+#      repo: "android_kernel_google_zuma"
+#      android_version: "android14"
+#      kernel_version: "6.1"
+#      release_tag: ${{ needs.generate-tag.outputs.new_tag }}
 
 
 #  build-kernel-zuma-ksu:
@@ -101,7 +101,7 @@ jobs:
     needs:
       - generate-tag
       #- build-kernel-zuma-ksu
-      - build-kernel-zuma-kowsu
+      #- build-kernel-zuma-kowsu
       - build-kernel-zuma-mksu
     
       
