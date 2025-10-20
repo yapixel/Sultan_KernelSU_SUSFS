@@ -88,8 +88,10 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
+          #curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
+          git clone https://github.com/SukiSU-Ultra/SukiSU-Ultra kernelSU -b susfs-main
           cd KernelSU
+          git checkout 761b5ee687667049785c8267a03380e24bd3dd85
           patch -p1 < ../../my_changes/fix_list_count_nodes_indent.patch
           cd ..
           
