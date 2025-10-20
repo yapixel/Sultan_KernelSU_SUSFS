@@ -69,7 +69,7 @@ jobs:
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-android14-6.1-dev"
+          SUSFS_BRANCH="gki-android14-6.1"
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
@@ -78,6 +78,10 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
           git clone https://gist.github.com/87371b65f283bb031d80e55b16b6d7ad.git my_changes
+
+          cd susfs4ksu
+          git checkout f16560ce8263fbfa9b2f259e9531f72d6fda4e3f
+          cd ../
       
       - name: Add KernelSU
         run: |
