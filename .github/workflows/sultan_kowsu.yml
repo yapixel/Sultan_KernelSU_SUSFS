@@ -62,6 +62,10 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
           git clone https://github.com/yapixel/kernel_patches.git 
           git clone https://github.com/KOWX712/files.git kowsu_patches
+
+          cd susfs4ksu
+          git checkout 0f77dfb8b6e5ca2a0ab82685c1be93c9ffc2ab3e
+          cd ../
           
       - name: Add KernelSU
         run: |
@@ -70,6 +74,7 @@ jobs:
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
           #git clone https://github.com/yapixel/KowSU KernelSU -b susfs-master
+
           
       - name: Apply SUSFS Patches
         run: |
