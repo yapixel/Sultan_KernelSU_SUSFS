@@ -87,7 +87,7 @@ jobs:
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
-          patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          #patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
           cd ./KernelSU
           echo "Revert commitbconflict with susfs"
@@ -100,6 +100,7 @@ jobs:
          
           # Change to common directory and apply SUSFS patch
           cd ../
+          patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
@@ -114,12 +115,12 @@ jobs:
       
 
 
-      - name: Apply syscall Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          cp ../kernel_patches/sultan/syscall_hooks.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch 
+   #   - name: Apply syscall Hooks
+   #     run: |
+   #       echo "Changing to configuration directory: $CONFIG..."
+   #       cd "$CONFIG"
+   #       cp ../kernel_patches/sultan/syscall_hooks.patch ./
+   #       patch -p1 -F 3 < syscall_hooks.patch 
 
       - name: Getting KernelSU Version
         run: |
