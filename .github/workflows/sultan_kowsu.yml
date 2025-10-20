@@ -1,0 +1,268 @@
+
+name: Sultan KowSU
+permissions:
+  contents: write  # Allow writing to repository contents (for pushing tags)
+  actions: write   # Allows triggering actions
+
+on:
+  workflow_call:
+    inputs:
+      codename:
+        required: true
+        type: string
+      repo:
+        required: true
+        type: string
+      android_version:
+        required: true
+        type: string
+      kernel_version:
+        required: true
+        type: string
+      release_tag:
+        required: true
+        type: string
+  
+jobs:
+  build-kernel-sultan-kowsu-susfs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Installing dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y gcc-aarch64-linux-gnu
+
+      - name: Set CONFIG Environment Variable
+        run: |
+          CONFIG="${{ inputs.repo }}"
+          echo "CONFIG=$CONFIG" >> $GITHUB_ENV
+          echo "CONFIG set to: $CONFIG"
+
+      - name: Get Latest Sultan Tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LATEST_SULTAN_TAG=$(gh api repos/kerneltoast/android_kernel_google_zuma/tags --jq '.[0].name')
+          if [ -z "$LATEST_SULTAN_TAG" ]; then
+            echo "Error: Could not fetch latest Sultan tag"
+            exit 1
+          fi
+          echo "LATEST_SULTAN_TAG=$LATEST_SULTAN_TAG" >> $GITHUB_ENV
+          echo "Latest Sultan tag: $LATEST_SULTAN_TAG"
+
+      - name: Clone AnyKernel3 and Other Dependencies
+        run: |
+          echo "Cloning AnyKernel3 and other dependencies..."
+          ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
+          SUSFS_BRANCH="sultan-shiba-susfs-minimal
+          echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
+          echo "Using branch for SUSFS: $SUSFS_BRANCH"
+          git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
+          git clone https://github.com/kerneltoast/${{ inputs.repo }}
+          git clone https://github.com/yapixel/kernel_patches.git 
+          git clone https://github.com/KOWX712/files.git kowsu_patches
+          
+      - name: Add KernelSU
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"    
+          echo "Adding KernelSU..."
+          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
+          #git clone https://github.com/yapixel/KowSU KernelSU -b susfs-master
+          
+      - name: Apply SUSFS Patches
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          
+          echo "Applying SUSFS patches..."
+          
+          # Copy SUSFS patches
+          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
+          cp ../susfs4ksu/kernel_patches/fs/* ./fs/
+          cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
+
+          patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+
+          cd ./KernelSU
+          echo "Revert commitbconflict with susfs"
+          cp ../../kowsu_patches/KowSU/revert_commit_conflict_with_susfs.patch .
+          patch -p1 < revert_commit_conflict_with_susfs.patch
+          
+          echo "Apply KSU integration patches"   
+          cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
+          patch -p1 < enable_susfs_for_kowsu.patch
+         
+          # Change to common directory and apply SUSFS patch
+          cd ../
+          cp ../kernel_patches/sultan/sys.c_fix.patch ./
+          patch -p1 --fuzz=3 < sys.c_fix.patch
+
+       
+      - name: Apply KSU Hook Patches
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          echo "Applying manual hook patches..."
+          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
+          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch      
+
+
+   #   - name: Apply syscall Hooks
+   #     run: |
+   #       echo "Changing to configuration directory: $CONFIG..."
+   #       cd "$CONFIG"
+   #       cp ../kernel_patches/sultan/syscall_hooks.patch ./
+   #       patch -p1 -F 3 < syscall_hooks.patch 
+
+      - name: Getting KernelSU Version
+        run: |
+          cd "$CONFIG/KernelSU/kernel"
+          BASE_VERSION=10200
+          COMMIT_COUNT=$(/usr/bin/git rev-list --count HEAD)
+          KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
+          echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
+
+      - name: Apply Hide Stuff Patches
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          cp ../kernel_patches/69_hide_stuff.patch ./
+          patch -p1 -F 3 < 69_hide_stuff.patch 
+
+      - name: Add SUSFS Configuration Settings
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          defconfig="./arch/arm64/configs/${{ inputs.codename }}_defconfig"
+          
+          echo "Applying kernel configurations one by one..."
+          # KernelSU Core Configuration
+          echo "CONFIG_KSU=y" >> "$defconfig"
+          echo "CONFIG_KSU_KPROBES_HOOK=n" >> "$defconfig"
+          
+          # Mountify Support
+          echo "CONFIG_TMPFS_XATTR=y" >> "$defconfig"
+          echo "CONFIG_TMPFS_POSIX_ACL=y" >> "$defconfig"
+          
+          # Networking Configuration
+          echo "CONFIG_IP_NF_TARGET_TTL=y" >> "$defconfig"
+          echo "CONFIG_IP6_NF_TARGET_HL=y" >> "$defconfig"
+          echo "CONFIG_IP6_NF_MATCH_HL=y" >> "$defconfig"
+          echo "CONFIG_IP6_NF_NAT=y" >> "$defconfig"
+          echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> "$defconfig"
+          
+          # BBR TCP Congestion Control
+          echo "CONFIG_TCP_CONG_ADVANCED=y" >> "$defconfig"
+          echo "CONFIG_TCP_CONG_BBR=y" >> "$defconfig"
+          echo "CONFIG_NET_SCH_FQ=y" >> "$defconfig"
+          echo "CONFIG_TCP_CONG_BIC=n" >> "$defconfig"
+          echo "CONFIG_TCP_CONG_WESTWOOD=n" >> "$defconfig"
+          echo "CONFIG_TCP_CONG_HTCP=n" >> "$defconfig"
+          
+          # IPSet support
+          echo "CONFIG_IP_SET=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_MAX=65534" >> "$defconfig"
+          echo "CONFIG_IP_SET_BITMAP_IP=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_BITMAP_IPMAC=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_BITMAP_PORT=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_IP=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_IPMARK=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_IPPORT=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_IPPORTIP=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_IPPORTNET=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_IPMAC=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_MAC=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_NETPORTNET=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_NET=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_NETNET=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_NETPORT=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_HASH_NETIFACE=y" >> "$defconfig"
+          echo "CONFIG_IP_SET_LIST_SET=y"  >> "$defconfig"
+
+          # SUSFS Configuration
+          echo "CONFIG_KSU_SUSFS=y" >> "$defconfig"
+          #echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> "$defconfig"
+          
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> "$defconfig"
+          
+          echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> "$defconfig"
+          
+          echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> "$defconfig"
+          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> "$defconfig"
+          
+          
+          # Build Optimization Configuration
+          echo "CONFIG_LTO_CLANG_THIN=y" >> "$defconfig"
+          echo "CONFIG_LTO_CLANG=y" >> "$defconfig"
+          echo "CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE=y" >> "$defconfig"
+          echo "CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE_O3=n" >> "$defconfig"
+          echo "CONFIG_OPTIMIZE_INLINING=y" >> "$defconfig"
+
+
+      - name: Run sed and perl Commands
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          echo "Running sed commands..."
+          # Replace the entire CONFIG_LOCALVERSION line with the provided local_version
+          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-android14-11-g66e758f7d0c0-ab13748739"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          # Prevent setlocalversion from appending '+' for dirty state
+          sed -i 's/${LOCALVERSION+set}/set/' ./scripts/setlocalversion
+          # Set build timestamp
+          perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul 8 09:17:32 UTC 2025"/' ./init/Makefile
+          echo "Kernel version suffix set to -android14-11-g66e758f7d0c0-ab13748739 without dirty state '+'"
+          echo "Build timestamp set to Tue Jul 8 09:17:32 UTC 2025"
+          
+      - name: Build the Kernel
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          echo "Building the kernel..."
+          # Set SOURCE_DATE_EPOCH for reproducible build timestamp
+          export SOURCE_DATE_EPOCH=$(date -d "Tue Jul 8 09:17:32 UTC 2025" +%s)
+          if [ "${{ inputs.codename }}" == "zumapro" ]; then
+            export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
+          fi
+          make ${{ inputs.codename }}_defconfig -j$(nproc --all)
+          make V=1 -j$(nproc --all) 
+
+      - name: Copy Images
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          echo "Copying Image.lz4 and concatenating DTB files..."
+          cp ./out/arch/arm64/boot/Image.lz4 ../AnyKernel3/Image.lz4
+          if [ "${{ inputs.codename }}" == "gs201" ]; then
+            cat ./out/google-devices/gs201/dts/*.dtb > ../AnyKernel3/dtb
+          elif [ "${{ inputs.codename }}" == "zuma" ]; then
+            cat ./out/google-devices/zuma/dts/*.dtb > ../AnyKernel3/dtb
+          elif [ "${{ inputs.codename }}" == "zumapro" ]; then
+            cat ./out/google-devices/zumapro/dts/*.dtb > ../AnyKernel3/dtb
+          fi
+
+      - name: Create ZIP Files for Different Formats
+        run: |
+          echo "Navigating to AnyKernel3 directory..."
+          cd ./AnyKernel3
+          ZIP_NAME="KowSU-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_SUSFS-${{ inputs.release_tag }}.zip"
+          echo "Creating zip file $ZIP_NAME..."
+          zip -r "../$ZIP_NAME" ./*
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-${{ inputs.codename }}-kowsu
+          path: |
+            *.zip
