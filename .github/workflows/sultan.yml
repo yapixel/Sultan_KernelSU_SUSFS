@@ -69,9 +69,11 @@ jobs:
 
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
+          cd susfs4ksu
+          git checkout 646cfabce9d5dba5b806e9cbe2c198128ebd0e69
       
       - name: Add KernelSU
         run: |
@@ -100,13 +102,13 @@ jobs:
           patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
 
           echo "Applying wild SUSFS Fix patches..."
-          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.11/fix_core_hook.c.patch ./
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_core_hook.c.patch ./
           patch -p1 --forward < fix_core_hook.c.patch
 
-          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.11/fix_sucompat.c.patch ./
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_sucompat.c.patch ./
           patch -p1 --forward < fix_sucompat.c.patch
 
-          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.11/fix_kernel_compat.c.patch ./
+          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_kernel_compat.c.patch ./
           patch -p1 --forward < fix_kernel_compat.c.patch
           
           # Change to common directory and apply SUSFS patch
