@@ -45,9 +45,9 @@ jobs:
       REPO_OWNER: TheWildJames
       REPO_NAME: Sultan_KernelSU_SUSFS
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_NAME: "Sultan Kernels With KernelSU Next & SUSFS v1.5.11"
+      RELEASE_NAME: "Sultan Kernels With KernelSU Next & SUSFS v1.5.12"
       RELEASE_NOTES: |
-        This release contains KernelSU Next and SUSFS v1.5.11
+        This release contains KernelSU Next and SUSFS v1.5.12
         
         ⚠️ **COMPATIBILITY NOTICE** ⚠️
         Please ensure compatibility by comparing release dates with official Sultan kernel releases
@@ -60,8 +60,7 @@ jobs:
         
         Features:
         [+] Wild KSU
-        [+] SUSFS v1.5.11
-        [+] Magic Mount Support
+        [+] SUSFS v1.5.12
 
     steps:
       # Checkout the code
@@ -74,7 +73,7 @@ jobs:
             # Fetch the latest tag from GitHub (this is the latest tag based on the GitHub API)
             LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
             if [ -z "$LATEST_TAG" ]; then
-              LATEST_TAG="v1.5.11-r0"  # Default to v1.5.7-0 if no tag exists
+              LATEST_TAG="v1.5.12-r0"  # Default to v1.5.7-0 if no tag exists
             fi
             
             # Increment the suffix (e.g., v1.5.7-0 becomes v1.5.7-1)
