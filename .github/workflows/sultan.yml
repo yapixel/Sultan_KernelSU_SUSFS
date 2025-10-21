@@ -73,7 +73,7 @@ jobs:
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           cd susfs4ksu
-          git checkout 646cfabce9d5dba5b806e9cbe2c198128ebd0e69
+          git checkout f16560ce8263fbfa9b2f259e9531f72d6fda4e3f
       
       - name: Add KernelSU
         run: |
@@ -192,7 +192,6 @@ jobs:
           # SUSFS Configuration
           echo "# SUSFS Configuration" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "#CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
