@@ -50,6 +50,7 @@ jobs:
           echo "LATEST_SULTAN_TAG=$LATEST_SULTAN_TAG" >> $GITHUB_ENV
           echo "Latest Sultan tag: $LATEST_SULTAN_TAG"
 
+
       - name: Clone AnyKernel3 and Other Dependencies
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
@@ -64,9 +65,9 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git 
           git clone https://github.com/KOWX712/files.git kowsu_patches
 
-          #cd susfs4ksu
-          #git checkout 72aef829edfad85b92e14886f91f39ea5c5c13c9
-          #cd ../
+          cd susfs4ksu
+          git checkout 72aef829edfad85b92e14886f91f39ea5c5c13c9
+          cd ../
           
       - name: Add KernelSU
         run: |
