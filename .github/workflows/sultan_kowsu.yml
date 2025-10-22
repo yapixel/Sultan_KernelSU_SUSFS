@@ -102,7 +102,13 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
-    
+      - name: Apply KSU Hooks
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd  "$CONFIG"
+          cp ../kernel_patches/mksu/ksu_hooks_v1.5.patch ./
+          patch -p1 -F 3 < ksu_hooks_v1.5.patch
+
 
       - name: Getting KernelSU Version
         run: |
