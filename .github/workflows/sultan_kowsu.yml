@@ -111,7 +111,7 @@ jobs:
           cd "$CONFIG"
           echo "Applying manual hook patches..."
           cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
-          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch
+          patch -p1 -F3 --forward < min_scope_syscall_hooks_v1.5.patch
     
 
       - name: Getting KernelSU Version
