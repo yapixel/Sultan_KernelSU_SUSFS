@@ -51,7 +51,7 @@ jobs:
           echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
   build-kernel-zuma-rksu:
-    uses: ./.github/workflows/sultan.yml
+    uses: ./.github/workflows/sultan_rksu.yml
     secrets: inherit
     needs: generate-tag
     if: ${{ inputs.make_release || inputs.dry_run }}
