@@ -45,7 +45,7 @@ jobs:
           echo "Cloning AnyKernel3 and other dependencies..."
           
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-android14-6.1-dev"
+          SUSFS_BRANCH="gki-android14-6.1"
           
           # Debug print the branches
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
@@ -53,10 +53,12 @@ jobs:
 
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
-          git clone https://gitlab.com/pershoot/susfs4ksu.git -b "$SUSFS_BRANCH"
+          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
+          cd susfs4ksu 
+          git checkout f095e8008116d2059eaf029e90bb7087773bae99
       
 
       - name: Add KernelSU
@@ -65,7 +67,7 @@ jobs:
           cd "$CONFIG"
           
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/backslashxx/KernelSU/master/kernel/setup.sh" | bash -s master
+          curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/master/kernel/setup.sh" | bash -s susfs-main
 
       - name: Apply SUSFS Patches
         run: |
@@ -76,7 +78,6 @@ jobs:
           
           # Copy SUSFS patches
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
-          cp ../susfs4ksu/kernel_patches/60_scope-minimized_manual_hooks.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
@@ -85,20 +86,19 @@ jobs:
           # Change to common directory and apply SUSFS patch
           cd ..
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          patch -p1 < 60_scope-minimized_manual_hooks.patch
+          
 
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
           
 
-    
-
-      - name: Apply KSU Hooks
+      - name: Apply KSU Hook Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
-          cd  "$CONFIG"
-          cp ../kernel_patches/xxksu/ksu_hooks.patch ./
-          patch -p1 -F 3 < ksu_hooks.patch 
+          cd "$CONFIG"
+          echo "Applying manual hook patches..."
+          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
+          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch
 
       - name: Apply Hide Stuff Patches
         run: |
@@ -158,9 +158,15 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          
           echo "Running sed commands..."
-          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-zen"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          # Replace the entire CONFIG_LOCALVERSION line with the provided local_version
+          sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-android14-11-g66e758f7d0c0-ab13748739"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          # Prevent setlocalversion from appending '+' for dirty state
+          sed -i 's/${LOCALVERSION+set}/set/' ./scripts/setlocalversion
+          # Set build timestamp
+          perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul 8 09:17:32 UTC 2025"/' ./init/Makefile
+          echo "Kernel version suffix set to -android14-11-g66e758f7d0c0-ab13748739 without dirty state '+'"
+          echo "Build timestamp set to Tue Jul 8 09:17:32 UTC 2025"
 
       - name: Check for KernelSU Functions
         run: |
@@ -204,7 +210,7 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="${{ inputs.codename }}_A16_Sultan_MKSU_SUSFS.zip"
+          ZIP_NAME="${{ inputs.codename }}_A16_Sultan_RKSU_SUSFS.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
           
