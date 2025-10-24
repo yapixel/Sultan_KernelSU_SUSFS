@@ -1,3 +1,4 @@
+
 name: Sultan KowSU
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
@@ -21,7 +22,7 @@ on:
       release_tag:
         required: true
         type: string
-
+  
 jobs:
   build-kernel-sultan-kowsu-susfs:
     runs-on: ubuntu-latest
@@ -29,29 +30,7 @@ jobs:
       - name: Installing dependencies
         run: |
           sudo apt update
-          sudo apt install -y gcc-aarch64-linux-gnu wget
-
-      - name: Download and Extract Clang
-        run: |
-          echo "Downloading Clang r487747c..."
-          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android14-release/clang-r487747c.tar.gz
-          echo "Extracting Clang to /opt/clang-r487747c..."
-          sudo mkdir -p /opt/clang-r487747c
-          sudo tar -xvzf clang-r487747c.tar.gz -C /opt/clang-r487747c
-          echo "Listing extracted files for debugging..."
-          find /opt/clang-r487747c -type f
-          echo "Searching for clang binary..."
-          CLANG_BINARY=$(find /opt/clang-r487747c -type f -name "clang" | head -n 1)
-          if [ -z "$CLANG_BINARY" ]; then
-            echo "Error: clang binary not found in /opt/clang-r487747c"
-            exit 1
-          fi
-          CLANG_DIR=$(dirname "$CLANG_BINARY")
-          echo "CLANG_PATH=$CLANG_DIR" >> $GITHUB_ENV
-          echo "PATH=$CLANG_DIR:$PATH" >> $GITHUB_ENV
-          echo "Clang binary found at: $CLANG_BINARY"
-          echo "Clang version:"
-          "$CLANG_BINARY" --version
+          sudo apt install -y gcc-aarch64-linux-gnu
 
       - name: Set CONFIG Environment Variable
         run: |
@@ -71,11 +50,13 @@ jobs:
           echo "LATEST_SULTAN_TAG=$LATEST_SULTAN_TAG" >> $GITHUB_ENV
           echo "Latest Sultan tag: $LATEST_SULTAN_TAG"
 
+
       - name: Clone AnyKernel3 and Other Dependencies
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
           SUSFS_BRANCH="sultan-shiba-susfs-minimal"
+          #SUSFS_BRANCH="gki-android14-6.1"
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
@@ -84,13 +65,15 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git 
           git clone https://github.com/KOWX712/files.git kowsu_patches
 
+          
       - name: Add KernelSU
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"    
           echo "Adding KernelSU..."
           curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
-
+          #git clone https://github.com/yapixel/KowSU KernelSU -b susfs-minimal-master
+          
       - name: Apply SUSFS Patches
         run: |
           echo "Changing to configuration directory: $CONFIG..."
@@ -109,7 +92,7 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
           
           cd KernelSU/
-          echo "Revert commit conflict with susfs"
+          echo "Revert commitbconflict with susfs"
           cp ../../kowsu_patches/KowSU/revert_commit_conflict_with_susfs.patch .
           patch -p1 --fuzz=3 < revert_commit_conflict_with_susfs.patch
 
@@ -120,6 +103,7 @@ jobs:
           cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
           patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
 
+          
       - name: Apply Hooks Patches
         run: |
           cd "$CONFIG"
@@ -197,21 +181,34 @@ jobs:
           echo "CONFIG_IP_SET_LIST_SET=y" >> ./arch/arm64/configs/zuma_defconfig
           echo "CONFIG_IP6_NF_NAT=y" >> ./arch/arm64/configs/zuma_defconfig
           echo "CONFIG_IP6_NF_TARGET_MASQUERADE=y" >> ./arch/arm64/configs/zuma_defconfig
-
+          
+          
+          
+   #   - name: Run sed and perl Commands
+   #     run: |
+   #       echo "Changing to configuration directory: $CONFIG..."
+   #       cd "$CONFIG"
+   #       echo "Running sed commands..."
+   #       # Replace the entire CONFIG_LOCALVERSION line with the provided local_version
+   #       sed -i 's/CONFIG_LOCALVERSION="-Sultan"/CONFIG_LOCALVERSION="-android14-11-g66e758f7d0c0-ab13748739"/' ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+   #       # Prevent setlocalversion from appending '+' for dirty state
+   #       sed -i 's/${LOCALVERSION+set}/set/' ./scripts/setlocalversion
+   #      # Set build timestamp
+   #       perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul 8 09:17:32 UTC 2025"/' ./init/Makefile
+  
+          
       - name: Build the Kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          echo "Building the kernel with Clang r487747c..."
+          echo "Building the kernel..."
           # Set SOURCE_DATE_EPOCH for reproducible build timestamp
           export SOURCE_DATE_EPOCH=$(date -d "Tue Jul 8 09:17:32 UTC 2025" +%s)
-          export CC="${{ env.CLANG_PATH }}/clang"
-          export CLANG_TRIPLE=aarch64-linux-gnu-
           if [ "${{ inputs.codename }}" == "zumapro" ]; then
             export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
           fi
-          make CC=$CC CLANG_TRIPLE=$CLANG_TRIPLE ${{ inputs.codename }}_defconfig -j$(nproc --all)
-          make CC=$CC CLANG_TRIPLE=$CLANG_TRIPLE V=1 -j$(nproc --all)
+          make ${{ inputs.codename }}_defconfig -j$(nproc --all)
+          make V=1 -j$(nproc --all) 
 
       - name: Copy Images
         run: |
