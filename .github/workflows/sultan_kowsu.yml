@@ -90,14 +90,15 @@ jobs:
 
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
+
+          cp ../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_base.c.patch ./
+          patch -p1 --fuzz=3 < fix_base.c.patch
           
-      - name: Apply KSU Hooks
+      - name: Apply Hooks Patches
         run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          # Apply additional patch
-          cp ../kernel_patches/sultan/syscall_hooks.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch
+          cd "$CONFIG/common"
+          cp ../../kernel_patches/wild/hooks/scope_min_manual_hooks_v1.4.patch ./
+          patch -p1 -F 3 < scope_min_manual_hooks_v1.4.patch
 
       - name: Getting KernelSU Version
         run: |
