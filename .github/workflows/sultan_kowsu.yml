@@ -94,8 +94,8 @@ jobs:
           cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
           patch -p1 < enable_susfs_for_kowsu.patch
 
-          cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
-          patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
+          #cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
+          #patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
          
           # Change to common directory and apply SUSFS patch
           cd ../
