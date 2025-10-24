@@ -103,9 +103,6 @@ jobs:
           cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
           patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
 
-          cd ../
-          cp ../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_base.c.patch ./
-          patch -p1 --fuzz=3 < fix_base.c.patch
           
       - name: Apply Hooks Patches
         run: |
