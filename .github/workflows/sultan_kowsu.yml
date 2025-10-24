@@ -71,8 +71,8 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"    
           echo "Adding KernelSU..."
-          #curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
-          git clone https://github.com/yapixel/KowSU KernelSU -b susfs-minimal-master
+          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
+          #git clone https://github.com/yapixel/KowSU KernelSU -b susfs-minimal-master
           
       - name: Apply SUSFS Patches
         run: |
@@ -91,11 +91,19 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
           
-          #cd KernelSU/
-          #cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
-          #patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
+          cd KernelSU/
+          echo "Revert commitbconflict with susfs"
+          cp ../../kowsu_patches/KowSU/revert_commit_conflict_with_susfs.patch .
+          patch -p1 --fuzz=3 < revert_commit_conflict_with_susfs.patch
 
-          #cd ../
+          echo "Applying KSU SUSFS patches..."
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
+          
+          cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
+          patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
+
+          cd ../
           cp ../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_base.c.patch ./
           patch -p1 --fuzz=3 < fix_base.c.patch
           
