@@ -100,15 +100,15 @@ jobs:
           cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
           patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
           
-          cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
-          patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
+          #cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
+          #patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
 
           
-      - name: Apply Hooks Patches
-        run: |
-          cd "$CONFIG"
-          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
-          patch -p1 -F 3 < min_scope_syscall_hooks_v1.5.patch
+      #- name: Apply Hooks Patches
+      #  run: |
+      #    cd "$CONFIG"
+      #    cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
+      #    patch -p1 -F 3 < min_scope_syscall_hooks_v1.5.patch
 
       - name: Getting KernelSU Version
         run: |
