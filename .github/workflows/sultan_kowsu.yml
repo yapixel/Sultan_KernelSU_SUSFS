@@ -34,13 +34,24 @@ jobs:
       - name: Download and Extract Clang
         run: |
           echo "Downloading Clang r487747c..."
-          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android14-release/clang-r487747c.tar.gz
-          echo "Extracting Clang..."
-          tar -xvzf clang-r487747c.tar.gz -C /opt
-          echo "CLANG_PATH=/opt/clang-r487747c/bin" >> $GITHUB_ENV
-          echo "PATH=/opt/clang-r487747c/bin:$PATH" >> $GITHUB_ENV
+          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r487747c.tar.gz
+          echo "Extracting Clang to /opt/clang-r487747c..."
+          sudo mkdir -p /opt/clang-r487747c
+          sudo tar -xvzf clang-r487747c.tar.gz -C /opt/clang-r487747c
+          echo "Listing extracted files for debugging..."
+          find /opt/clang-r487747c -type f
+          echo "Searching for clang binary..."
+          CLANG_BINARY=$(find /opt/clang-r487747c -type f -name "clang" | head -n 1)
+          if [ -z "$CLANG_BINARY" ]; then
+            echo "Error: clang binary not found in /opt/clang-r487747c"
+            exit 1
+          fi
+          CLANG_DIR=$(dirname "$CLANG_BINARY")
+          echo "CLANG_PATH=$CLANG_DIR" >> $GITHUB_ENV
+          echo "PATH=$CLANG_DIR:$PATH" >> $GITHUB_ENV
+          echo "Clang binary found at: $CLANG_BINARY"
           echo "Clang version:"
-          /opt/clang-r487747c/bin/clang --version
+          "$CLANG_BINARY" --version
 
       - name: Set CONFIG Environment Variable
         run: |
@@ -194,7 +205,7 @@ jobs:
           echo "Building the kernel with Clang r487747c..."
           # Set SOURCE_DATE_EPOCH for reproducible build timestamp
           export SOURCE_DATE_EPOCH=$(date -d "Tue Jul 8 09:17:32 UTC 2025" +%s)
-          export CC=/opt/clang-r487747c/bin/clang
+          export CC="${{ env.CLANG_PATH }}/clang"
           export CLANG_TRIPLE=aarch64-linux-gnu-
           if [ "${{ inputs.codename }}" == "zumapro" ]; then
             export KCFLAGS="-march=armv8.6-a -O3 --param=min-pagesize=0"
