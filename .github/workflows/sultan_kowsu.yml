@@ -90,6 +90,7 @@ jobs:
 
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
+          
           cd KernelSU/
           cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
           patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
