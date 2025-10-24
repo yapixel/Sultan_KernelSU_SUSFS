@@ -34,7 +34,7 @@ jobs:
       - name: Download and Extract Clang
         run: |
           echo "Downloading Clang r487747c..."
-          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r487747c.tar.gz
+          wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android14-release/clang-r487747c.tar.gz
           echo "Extracting Clang to /opt/clang-r487747c..."
           sudo mkdir -p /opt/clang-r487747c
           sudo tar -xvzf clang-r487747c.tar.gz -C /opt/clang-r487747c
