@@ -196,7 +196,14 @@ jobs:
    #      # Set build timestamp
    #       perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Tue Jul 8 09:17:32 UTC 2025"/' ./init/Makefile
   
-          
+      - name: Set Build User and Host Environment Variables
+        run: |
+         echo "Changing to configuration directory: $CONFIG..."
+         cd "$CONFIG"
+         echo "Setting KBUILD_BUILD_USER and KBUILD_BUILD_HOST..."
+         echo "KBUILD_BUILD_USER=build-user" >> $GITHUB_ENV
+         echo "KBUILD_BUILD_HOST=build-host" >> $GITHUB_ENV
+      
       - name: Build the Kernel
         run: |
           echo "Changing to configuration directory: $CONFIG..."
