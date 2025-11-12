@@ -117,9 +117,9 @@ jobs:
       - name: Getting KernelSU Version
         run: |
           cd "$CONFIG/KernelSU/kernel"
-          BASE_VERSION=13000
+          BASE_VERSION=40000
           COMMIT_COUNT=$(/usr/bin/git rev-list --count HEAD)
-          KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
+          KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION - 2815)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
 
       - name: Add SUSFS Configuration Settings
@@ -129,6 +129,7 @@ jobs:
           echo "Adding configuration settings to ${{ inputs.codename }}_defconfig..."
           echo "CONFIG_KSU=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          echo "CONFIG_KSU_MANUAL_HOOK=y" >>  ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_MANUAL_HOOK=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
