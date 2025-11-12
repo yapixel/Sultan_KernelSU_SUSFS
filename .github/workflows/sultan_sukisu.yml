@@ -77,7 +77,7 @@ jobs:
           git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
-          #git clone https://gist.github.com/87371b65f283bb031d80e55b16b6d7ad.git my_changes
+          git clone https://github.com/TheSillyOk/kernel_ls_patches ok_patches
 
           #cd susfs4ksu
           #git checkout f16560ce8263fbfa9b2f259e9531f72d6fda4e3f
@@ -107,12 +107,12 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
-      - name: Apply syscall Hooks
+      - name: Apply Manual Hooks
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          cp ../SukiSU_patch/hooks/syscall_hooks.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch 
+          cp ../ok_patch/sultan/scope-min-hooks-v1.6.patch ./
+          patch -p1 -F 3 < scope-min-hooks-v1.6.patch
 
       - name: Getting KernelSU Version
         run: |
