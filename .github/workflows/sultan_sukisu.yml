@@ -77,7 +77,7 @@ jobs:
           git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
-          git clone https://gist.github.com/87371b65f283bb031d80e55b16b6d7ad.git my_changes
+          #git clone https://gist.github.com/87371b65f283bb031d80e55b16b6d7ad.git my_changes
 
           #cd susfs4ksu
           #git checkout f16560ce8263fbfa9b2f259e9531f72d6fda4e3f
@@ -90,10 +90,10 @@ jobs:
           echo "Adding KernelSU..."
           #curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
           git clone https://github.com/SukiSU-Ultra/SukiSU-Ultra KernelSU -b susfs-main
-          cd KernelSU
+          #cd KernelSU
           #git checkout 761b5ee687667049785c8267a03380e24bd3dd85
-          patch -p1 < ../../my_changes/fix_list_count_nodes_indent.patch
-          cd ..
+          #patch -p1 < ../../my_changes/fix_list_count_nodes_indent.patch
+          #cd ..
           
       - name: Apply SUSFS Patches
         run: |
