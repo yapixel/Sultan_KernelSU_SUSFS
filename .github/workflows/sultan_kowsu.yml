@@ -85,20 +85,20 @@ jobs:
 
           patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
 
-          cd ./KernelSU
-          echo "Revert commitbconflict with susfs"
-          cp ../../kowsu_patches/KowSU/revert_commit_conflict_with_susfs.patch .
-          patch -p1 --fuzz=3 < revert_commit_conflict_with_susfs.patch
+          #cd ./KernelSU
+          #echo "Revert commitbconflict with susfs"
+          #cp ../../kowsu_patches/KowSU/revert_commit_conflict_with_susfs.patch .
+          #patch -p1 --fuzz=3 < revert_commit_conflict_with_susfs.patch
           
-          echo "Apply KSU integration patches"   
-          cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
-          patch -p1 < enable_susfs_for_kowsu.patch
+          #echo "Apply KSU integration patches"   
+          #cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
+          #patch -p1 < enable_susfs_for_kowsu.patch
 
           #cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
           #patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
          
           # Change to common directory and apply SUSFS patch
-          cd ../
+          #cd ../
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
@@ -108,8 +108,8 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Applying manual hook patches..."
-          cp ../kernel_patches/syscall_hook/min_scope_syscall_hooks_v1.5.patch ./
-          patch -p1 --forward < min_scope_syscall_hooks_v1.5.patch      
+          cp ../kernel_patches/syscall_hook/scope-min-hooks-v1.6.patch ./
+          patch -p1 --forward < scope-min-hooks-v1.6.patch
 
 
    #   - name: Apply syscall Hooks
@@ -122,7 +122,7 @@ jobs:
       - name: Getting KernelSU Version
         run: |
           cd "$CONFIG/KernelSU/kernel"
-          BASE_VERSION=10200
+          BASE_VERSION=20000
           COMMIT_COUNT=$(/usr/bin/git rev-list --count HEAD)
           KSU_VERSION=$(expr $COMMIT_COUNT "+" $BASE_VERSION)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
