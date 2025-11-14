@@ -74,7 +74,7 @@ jobs:
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git -b susfs-test
+          git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git 
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
           git clone https://github.com/TheSillyOk/kernel_ls_patches ok_patches
