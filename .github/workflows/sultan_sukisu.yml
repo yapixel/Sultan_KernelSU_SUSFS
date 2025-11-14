@@ -69,12 +69,12 @@ jobs:
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-android14-6.1"
+          SUSFS_BRANCH="gki-android14-6.1-dev"
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git
+          git clone https://github.com/SukiSU-Ultra/SukiSU_patch.git -b susfs-test
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
           git clone https://github.com/TheSillyOk/kernel_ls_patches ok_patches
@@ -88,8 +88,8 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding KernelSU..."
-          #curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-main
-          git clone https://github.com/SukiSU-Ultra/SukiSU-Ultra KernelSU -b susfs-main
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-test
+          #git clone https://github.com/SukiSU-Ultra/SukiSU-Ultra KernelSU -b susfs-test
           #cd KernelSU
           #git checkout 761b5ee687667049785c8267a03380e24bd3dd85
           #patch -p1 < ../../my_changes/fix_list_count_nodes_indent.patch
@@ -107,12 +107,12 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
-      - name: Apply Manual Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          cp ../ok_patches/sultan/scope-min-hooks-v1.6.patch ./
-          patch -p1 -F 3 < scope-min-hooks-v1.6.patch
+   #   - name: Apply Manual Hooks
+   #     run: |
+   #       echo "Changing to configuration directory: $CONFIG..."
+   #       cd "$CONFIG"
+   #       cp ../ok_patches/sultan/scope-min-hooks-v1.6.patch ./
+   #       patch -p1 -F 3 < scope-min-hooks-v1.6.patch
 
       - name: Getting KernelSU Version
         run: |
