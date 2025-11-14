@@ -103,13 +103,13 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
        
-      - name: Apply KSU Hook Patches
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          echo "Applying manual hook patches..."
-          cp ../kernel_patches/syscall_hook/scope-min-hooks-v1.6.patch ./
-          patch -p1 --forward < scope-min-hooks-v1.6.patch
+  #    - name: Apply KSU Hook Patches
+  #      run: |
+  #        echo "Changing to configuration directory: $CONFIG..."
+  #        cd "$CONFIG"
+  #        echo "Applying manual hook patches..."
+  #        cp ../kernel_patches/syscall_hook/scope-min-hooks-v1.6.patch ./
+  #        patch -p1 --forward < scope-min-hooks-v1.6.patch
 
 
    #   - name: Apply syscall Hooks
