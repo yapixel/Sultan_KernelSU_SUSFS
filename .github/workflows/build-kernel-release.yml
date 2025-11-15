@@ -38,7 +38,7 @@ jobs:
           # Fetch the latest tag from this repository
           LATEST_TAG=$(gh api repos/$REPO_OWNER/$REPO_NAME/tags --jq '.[0].name')
           if [ -z "$LATEST_TAG" ]; then
-            LATEST_TAG="v1.5.12-r0"  # Default to v1.5.12-r0 if no tag exists
+            LATEST_TAG="v2.0.0-r0"  # Default to v1.5.12-r0 if no tag exists
           fi
           
           # Increment the suffix (e.g., v1.5.12-r0 becomes v1.5.12-r1)
@@ -79,7 +79,7 @@ jobs:
     needs:
       - generate-tag
       - build-kernel-zuma-sukisu
-      #- build-kernel-zuma-kowsu
+      - build-kernel-zuma-kowsu
     if: ${{ inputs.make_release && !inputs.dry_run }}
     env:
       GH_TOKEN: ${{ github.token }}
@@ -135,7 +135,7 @@ jobs:
             -> https://github.com/SukiSU-Ultra/SukiSU-Ultra
             
             Features:
-            [+] KernelSU Magic Managers v1.0.5
+            [+] KernelSU Magic Managers v2.1.x
             [+] SUSFS $SUSFS_VERSION
             [+] Maphide LineageOS Detections
             [+] Futile Maphide for jit-zygote-cache Detections
