@@ -79,26 +79,19 @@ jobs:
           echo "Applying SUSFS patches..."
           
           # Copy SUSFS patches
-          cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
+          cp ../kernel_patches/kowsu/0001-add-SuSFS-v2.0.0.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
-          patch -p1 -F 3 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          patch -p1 -F 3 < 0001-add-SuSFS-v2.0.0.patch || true
 
-          #cd ./KernelSU
-          #echo "Revert commitbconflict with susfs"
-          #cp ../../kowsu_patches/KowSU/revert_commit_conflict_with_susfs.patch .
-          #patch -p1 --fuzz=3 < revert_commit_conflict_with_susfs.patch
-          
-          #echo "Apply KSU integration patches"   
-          #cp ../../kowsu_patches/KowSU/enable_susfs_for_kowsu.patch ./
-          #patch -p1 < enable_susfs_for_kowsu.patch
-
-          #cp ../../kowsu_patches/KowSU/fix_core_hook_kowsu.patch ./
-          #patch -p1 --fuzz=3 < fix_core_hook_kowsu.patch
+          cd ./KernelSU
+          echo "Apply KSU integration patches"   
+          cp ../../kernel_patches/kowsu/0001-KSU-kernel-side.patch ./
+          patch -p1 --fuzz=3 < 0001-KSU-kernel-side.patch
          
           # Change to common directory and apply SUSFS patch
-          #cd ../
+          cd ../
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
