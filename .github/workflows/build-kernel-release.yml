@@ -80,6 +80,7 @@ jobs:
       - generate-tag
       - build-kernel-zuma-sukisu
       - build-kernel-zuma-kowsu
+      
     if: ${{ inputs.make_release && !inputs.dry_run }}
     env:
       GH_TOKEN: ${{ github.token }}
