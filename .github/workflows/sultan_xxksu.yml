@@ -72,9 +72,9 @@ jobs:
           git clone https://github.com/yapixel/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
 
-          cd susfs4ksu 
-          git checkout a26ba8380e1d10b2169b8148967c4f5108c2a3f7
-          cd ..
+          #cd susfs4ksu 
+          #git checkout a26ba8380e1d10b2169b8148967c4f5108c2a3f7
+          #cd ..
 
       
       - name: Add KernelSU
@@ -100,9 +100,9 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
           # Apply KSU integration patches
-          cd ./KernelSU
-          cp ../../kernel_patches/xxksu/30_susfs_backslashxx_ksu_patches.patch ./
-          patch -p1 --forward < 30_susfs_backslashxx_ksu_patches.patch
+          #cd ./KernelSU
+          #cp ../../kernel_patches/xxksu/30_susfs_backslashxx_ksu_patches.patch ./
+          #patch -p1 --forward < 30_susfs_backslashxx_ksu_patches.patch
          
       - name: Apply Manual Hook Patches
         run: |
