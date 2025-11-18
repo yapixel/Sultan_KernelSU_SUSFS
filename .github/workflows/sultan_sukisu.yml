@@ -101,6 +101,9 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
+          cp ../kernel_patches/sukisu/fix_file_wrapper.c.patch ./
+          patch -p1 < fix_file_wrapper.c.patch
+
    #   - name: Apply Manual Hooks
    #     run: |
    #       echo "Changing to configuration directory: $CONFIG..."
