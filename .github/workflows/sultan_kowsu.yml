@@ -79,16 +79,16 @@ jobs:
           echo "Applying SUSFS patches..."
           
           # Copy SUSFS patches
-          cp ../kernel_patches/kowsu/0001-add-SuSFS-v2.0.0.patch ./
+          cp ../kernel_patches/kowsu/0001-50_add_susfs_to_kernelside_KOWX712.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
-          patch -p1 -F 3 < 0001-add-SuSFS-v2.0.0.patch || true
+          patch -p1 -F 3 < 0001-50_add_susfs_to_kernelside_KOWX712.patch|| true
 
           cd ./KernelSU
           echo "Apply KSU integration patches"   
-          cp ../../kernel_patches/kowsu/0001-KSU-kernel-side.patch ./
-          patch -p1 --fuzz=3 < 0001-KSU-kernel-side.patch
+          cp ../../kernel_patches/kowsu/0001-10-add_SuSFS_to_KernelSU_KOWX712.patch ./
+          patch -p1 --fuzz=3 < 0001-10-add_SuSFS_to_KernelSU_KOWX712.patch
          
           # Change to common directory and apply SUSFS patch
           cd ../
