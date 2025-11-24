@@ -111,6 +111,14 @@ jobs:
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
+
+      - name: Apply KSU Hooks
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd  "$CONFIG"
+          cp ../kernel_patches/syscall_hook/scope-min-hooks-v1.6.patch ./
+          patch -p1 -F 3 < scope-min-hooks-v1.6.patch
+
        
   
 
@@ -157,7 +165,7 @@ jobs:
           echo "CONFIG_IP6_NF_TARGET_HL=y" >> ./arch/arm64/configs/zuma_defconfig
           echo "CONFIG_IP6_NF_MATCH_HL=y" >> ./arch/arm64/configs/zuma_defconfig
           echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./arch/arm64/configs/zuma_defconfig
-          echo "CONFIG_TCP_CONG_BBR=y" >> ./arch/arm64/configs/zuma_defconfig
+          echo "CONFIG_TCP_CONG_BBR=y" >> ./arch/ arm64/configs/zuma_defconfig
           echo "CONFIG_NET_SCH_FQ=y" >> ./arch/arm64/configs/zuma_defconfig
           echo "CONFIG_TCP_CONG_BIC=n" >> ./arch/arm64/configs/zuma_defconfig
           echo "CONFIG_TCP_CONG_WESTWOOD=n" >> ./arch/arm64/configs/zuma_defconfig
