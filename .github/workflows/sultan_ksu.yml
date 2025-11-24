@@ -1,5 +1,5 @@
 
-name: Sultan KowSU
+name: Sultan KSU
 permissions:
   contents: write  # Allow writing to repository contents (for pushing tags)
   actions: write   # Allows triggering actions
@@ -54,7 +54,7 @@ jobs:
         run: |
           echo "Cloning AnyKernel3 and other dependencies..."
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-android14-6.1-dev"
+          SUSFS_BRANCH="gki-android14-6.1"
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
           echo "Using branch for SUSFS: $SUSFS_BRANCH"
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
@@ -68,8 +68,8 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"    
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/KOWX712/KernelSU/master/kernel/setup.sh" | bash -s master
-          #git clone https://github.com/yapixel/KowSU KernelSU -b susfs-master
+          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/master/kernel/setup.sh" | bash -s e1e58ed737159bb146742353ec910642eefc885a
+          
           
       - name: Apply SUSFS Patches
         run: |
@@ -79,16 +79,16 @@ jobs:
           echo "Applying SUSFS patches..."
           
           # Copy SUSFS patches
-          cp ../kernel_patches/kowsu/0001-50_add_susfs_to_kernelside_KOWX712.patch ./
+          cp ../susfs4ksu/kernel_patches50_add_susfs_in_gki-android14-6.1.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
 
-          patch -p1 -F 3 < 0001-50_add_susfs_to_kernelside_KOWX712.patch|| true
+          patch -p1 -F 3 < 50_add_susfs_in_gki-android14-6.1.patch|| true
 
           cd ./KernelSU
           echo "Apply KSU integration patches"   
-          cp ../../kernel_patches/kowsu/0001-10-add_SuSFS_to_KernelSU_KOWX712.patch ./
-          patch -p1 --fuzz=3 < 0001-10-add_SuSFS_to_KernelSU_KOWX712.patch
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 --fuzz=3 < 10_enable_susfs_for_ksu.patch
          
           # Change to common directory and apply SUSFS patch
           cd ../
@@ -96,21 +96,7 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
        
-  #    - name: Apply KSU Hook Patches
-  #      run: |
-  #        echo "Changing to configuration directory: $CONFIG..."
-  #        cd "$CONFIG"
-  #        echo "Applying manual hook patches..."
-  #        cp ../kernel_patches/syscall_hook/scope-min-hooks-v1.6.patch ./
-  #        patch -p1 --forward < scope-min-hooks-v1.6.patch
-
-
-   #   - name: Apply syscall Hooks
-   #     run: |
-   #       echo "Changing to configuration directory: $CONFIG..."
-   #       cd "$CONFIG"
-   #       cp ../kernel_patches/sultan/syscall_hooks.patch ./
-   #       patch -p1 -F 3 < syscall_hooks.patch 
+  
 
       - name: Getting KernelSU Version
         run: |
@@ -234,13 +220,13 @@ jobs:
         run: |
           echo "Navigating to AnyKernel3 directory..."
           cd ./AnyKernel3
-          ZIP_NAME="KowSU-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_SUSFS-${{ inputs.release_tag }}.zip"
+          ZIP_NAME="KSU-${{ env.KSUVER }}-zuma_A16_Sultan-${{ env.LATEST_SULTAN_TAG }}_SUSFS-${{ inputs.release_tag }}.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-${{ inputs.codename }}-kowsu
+          name: kernel-${{ inputs.codename }}-ksu
           path: |
             *.zip
