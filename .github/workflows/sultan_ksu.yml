@@ -30,7 +30,7 @@ jobs:
       - name: Installing dependencies
         run: |
           sudo apt update
-          sudo apt install -y cccache
+          sudo apt install -y ccache
 
       - name: Download and extract GCC 14.2.0 toolchain
         run: |
