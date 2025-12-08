@@ -86,7 +86,7 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
           echo "Adding KernelSU..."
-          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin
+          curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s tmp-builtin
           
           
       - name: Apply SUSFS Patches
@@ -104,12 +104,12 @@ jobs:
           #cp ../../kernel_patches/sukisu/fix_file_wrapper.c.patch ./
           #patch -p1 < fix_file_wrapper.c.patch
 
-   #   - name: Apply Manual Hooks
-   #     run: |
-   #       echo "Changing to configuration directory: $CONFIG..."
-   #       cd "$CONFIG"
-   #       cp ../ok_patches/sultan/scope-min-hooks-v1.6.patch ./
-   #       patch -p1 -F 3 < scope-min-hooks-v1.6.patch
+      - name: Apply Manual Hooks
+        run: |
+          echo "Changing to configuration directory: $CONFIG..."
+          cd "$CONFIG"
+          cp ../ok_patches/sultan/scope-min-hooks-v1.6.patch ./
+          patch -p1 -F 3 < scope-min-hooks-v1.6.patch
 
       - name: Getting KernelSU Version
         run: |
