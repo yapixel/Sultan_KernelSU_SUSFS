@@ -112,12 +112,12 @@ jobs:
           patch -p1 --fuzz=3 < sys.c_fix.patch
 
 
-      - name: Apply KSU Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd  "$CONFIG"
-          cp ../kernel_patches/syscall_hook/scope-min-hooks-v1.6.patch ./
-          patch -p1 -F 3 < scope-min-hooks-v1.6.patch
+    #  - name: Apply KSU Hooks
+    #    run: |
+    #      echo "Changing to configuration directory: $CONFIG..."
+    #      cd  "$CONFIG"
+    #      cp ../kernel_patches/syscall_hook/scope-min-hooks-v1.6.patch ./
+    #      patch -p1 -F 3 < scope-min-hooks-v1.6.patch
 
        
   
