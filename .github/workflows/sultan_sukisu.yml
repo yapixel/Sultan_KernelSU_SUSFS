@@ -108,8 +108,9 @@ jobs:
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
-          cp ../ok_patches/sultan/scope-min-hooks-v1.6.patch ./
-          patch -p1 -F 3 < scope-min-hooks-v1.6.patch
+          
+          cp ../SukiSU_patch/hooks/scope_min_manual_hooks_v1.6.patch ./
+          patch -p1 -F 3 < scope_min_manual_hooks_v1.6.patch
 
       - name: Getting KernelSU Version
         run: |
