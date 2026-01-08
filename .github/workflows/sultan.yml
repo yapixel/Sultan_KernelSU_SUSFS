@@ -238,3 +238,12 @@ jobs:
               echo "$REL" >> "$REJECTS_DIR/index.txt"
             done
           fi
+
+      - name: Upload Rejects
+        if: ${{ always() && env.REJ_COUNT > 0 }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILE_NAME }}-Rejects
+          path: patch-rejects/
+          if-no-files-found: ignore
+          compression-level: 9
