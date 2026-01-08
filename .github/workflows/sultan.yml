@@ -35,7 +35,6 @@ jobs:
       #    remove-swapfile: 'true'        # Frees ~4 GB
       #    remove-cached-tools: 'false'   # Avoid unless confirmed safe
       #    verbose: 'true'                # Enable detailed logging
-          
 
       - name: Download and extract GCC 14.2.0 toolchain
         run: |
@@ -70,7 +69,8 @@ jobs:
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
-          git clone https://github.com/kerneltoast/${{ inputs.repo }}
+          #git clone https://github.com/kerneltoast/${{ inputs.repo }}
+          git clone --depth 1 --single-branch --no-clone-bundle https://github.com/kerneltoast/${{ inputs.repo }}
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
       
       - name: Add KernelSU
