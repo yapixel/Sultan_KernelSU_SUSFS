@@ -72,8 +72,6 @@ jobs:
           git clone https://github.com/TheWildJames/kernel_patches.git
           git clone https://github.com/kerneltoast/${{ inputs.repo }}
           git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
-          cd susfs4ksu
-          git checkout a162e2469d0b472545e5e46457eee171c0975fb0
       
       - name: Add KernelSU
         run: |
@@ -94,36 +92,12 @@ jobs:
           cp ../susfs4ksu/kernel_patches/50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch ./
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-
-          cd ./Wild_KSU
           
-          echo "Applying wild SUSFS patches..."
-          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
-          patch -p1 --forward < 10_enable_susfs_for_ksu.patch || true
-
-          echo "Applying wild SUSFS Fix patches..."
-          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_core_hook.c.patch ./
-          patch -p1 --forward < fix_core_hook.c.patch
-
-          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_sucompat.c.patch ./
-          patch -p1 --forward < fix_sucompat.c.patch
-
-          cp ../../kernel_patches/wild/susfs_fix_patches/v1.5.12/fix_kernel_compat.c.patch ./
-          patch -p1 --forward < fix_kernel_compat.c.patch
-          
-          # Change to common directory and apply SUSFS patch
-          cd ..
-          patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          cp ../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 --fuzz=3 < sys.c_fix.patch
-
-      - name: Apply KSU Hooks
-        run: |
-          echo "Changing to configuration directory: $CONFIG..."
-          cd "$CONFIG"
-          # Apply additional patch
-          cp ../kernel_patches/wild/hooks/syscall_hooks.patch ./
-          patch -p1 -F 3 < syscall_hooks.patch
+          ## Change to common directory and apply SUSFS patch
+          #cd ..
+          #patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
+          #cp ../kernel_patches/sultan/sys.c_fix.patch ./
+          #patch -p1 --fuzz=3 < sys.c_fix.patch
 
       - name: Configure KernelSU
         run: |
@@ -131,7 +105,7 @@ jobs:
           # KernelSU Configuration
           echo "# KernelSU Configuration" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
       - name: Configure Mountify Support
         run: |
@@ -185,30 +159,6 @@ jobs:
           echo "CONFIG_IP_SET_HASH_NETPORT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP_SET_HASH_NETIFACE=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_IP_SET_LIST_SET=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-
-      - name: Configure SUSFS
-        run: |
-          cd "$CONFIG"
-          # SUSFS Configuration
-          echo "# SUSFS Configuration" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_PATH=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-
-          echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-
-          echo "CONFIG_KSU_SUSFS_ENABLE_LOG=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
 
       - name: Run sed and perl Commands
