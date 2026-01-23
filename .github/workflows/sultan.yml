@@ -22,6 +22,9 @@ on:
 jobs:
   build-kernel-sultan-kernelsu-susfs:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        variant: ["WKSU", "WKSU-SUSFS"]
     steps:
       #- name: Maximize Build Space
       #  uses: AdityaGarg8/remove-unwanted-software@v5
@@ -60,18 +63,20 @@ jobs:
           echo "Cloning AnyKernel3 and other dependencies..."
 
           ANYKERNEL_BRANCH="sultan-${{ inputs.codename }}"
-          SUSFS_BRANCH="gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}"
 
           # Debug print the branches
           echo "Using branch for AnyKernel3: $ANYKERNEL_BRANCH"
-          echo "Using branch for SUSFS: $SUSFS_BRANCH"
 
           # Clone repositories using the branch names
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
           #git clone https://github.com/kerneltoast/${{ inputs.repo }}
           git clone --depth 1 --single-branch https://github.com/kerneltoast/${{ inputs.repo }}
-          git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
+          if [ "${{ matrix.variant }}" != "WKSU" ]; then
+            SUSFS_BRANCH="gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}"
+            echo "Using branch for SUSFS: $SUSFS_BRANCH"
+            git clone https://gitlab.com/simonpunk/susfs4ksu.git -b "$SUSFS_BRANCH"
+          fi
 
       - name: Add KernelSU
         run: |
@@ -82,6 +87,7 @@ jobs:
           curl -LSs "https://raw.githubusercontent.com/WildKernels/Wild_KSU/wild/kernel/setup.sh" | bash -s wild
 
       - name: Apply SUSFS Patches
+        if: ${{ matrix.variant != 'WKSU' }}
         run: |
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
@@ -104,7 +110,11 @@ jobs:
           # KernelSU Configuration
           echo "# KernelSU Configuration" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
           echo "CONFIG_KSU=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
-          echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          if [ "${{ matrix.variant }}" != "WKSU" ]; then
+            echo "CONFIG_KSU_SUSFS=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          else
+            echo "CONFIG_KSU_SUSFS=n" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
+          fi
 
       - name: Configure Mountify Support
         run: |
@@ -197,14 +207,14 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="${{ inputs.codename }}_A16_Sultan_WKSU_SUSFS.zip"
+          ZIP_NAME="${{ matrix.variant }}-${{ inputs.codename }}-A16-Sultan.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-${{ inputs.codename }}
+          name: kernel-${{ inputs.codename }}-${{ matrix.variant }}
           path: |
             *.zip
 
