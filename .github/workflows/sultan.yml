@@ -23,6 +23,7 @@ jobs:
   build-kernel-sultan-kernelsu-susfs:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         variant: ["WKSU", "SHEDOWE"]
         #, "WKSU-SUSFS"
