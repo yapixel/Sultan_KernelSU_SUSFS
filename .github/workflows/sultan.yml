@@ -242,7 +242,7 @@ jobs:
           cd ./AnyKernel3
 
           # Zip the files in the AnyKernel3 directory with a new naming convention
-          ZIP_NAME="${{ matrix.variant }}-${{ inputs.codename }-Sultan.zip"
+          ZIP_NAME="${{ matrix.variant }}-${{ inputs.codename }}-A16-Sultan.zip"
           echo "Creating zip file $ZIP_NAME..."
           zip -r "../$ZIP_NAME" ./*
 
