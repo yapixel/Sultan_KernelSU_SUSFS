@@ -93,6 +93,8 @@ jobs:
           echo "Changing to configuration directory: $CONFIG..."
           cd "$CONFIG"
 
+          SUSFS_VERSION="2.0.0"
+
           echo "Applying SUSFS patches..."
 
           # Copy SUSFS patches
@@ -102,8 +104,11 @@ jobs:
 
           # Change to common directory and apply SUSFS patch
           patch -p1 < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          cp ../kernel_patches/sultan/sys.c_fix.patch ./
-          patch -p1 < sys.c_fix.patch
+          #cp ../kernel_patches/sultan/sys.c_fix.patch ./
+          #patch -p1 < sys.c_fix.patch
+
+          #cp ../kernel_patches/wild/susfs_fix_patches/v${SUSFS_VERSION}/a14-6.1/base.c.patch ./
+          #patch -p1 < base.c.patch
 
       - name: Configure KernelSU
         run: |
@@ -219,41 +224,47 @@ jobs:
           path: |
             *.zip
 
-      - name: Scan and collect patch rejects
+      - name: Collect .rej files
         if: ${{ always() }}
+        id: collect_rej
+        shell: bash
         run: |
-          set -e
-          CONFIG_DIR="$KERNEL_ROOT"
-          REJECTS_DIR="$GITHUB_WORKSPACE/patch-rejects"
-          mkdir -p "$REJECTS_DIR"
-          # Find all .rej files under the configuration directory
-          mapfile -t REJS < <(find "$CONFIG_DIR" -type f -name '*.rej')
-          REJ_COUNT=${#REJS[@]}
-          echo "Found $REJ_COUNT .rej files under $CONFIG_DIR"
-          echo "REJ_COUNT=$REJ_COUNT" >> $GITHUB_ENV
-          if [ "$REJ_COUNT" -gt 0 ]; then
-            for REJ in "${REJS[@]}"; do
-              # Relative path from $CONFIG
-              REL="${REJ#"$CONFIG_DIR"/}"
-              DEST="$REJECTS_DIR/$REL"
-              mkdir -p "$(dirname "$DEST")"
-              cp "$REJ" "$DEST"
-              # Copy the associated original file alongside the .rej
-              ORIG="${REJ%.rej}"
-              if [ -f "$ORIG" ]; then
-                ORIG_DEST="$REJECTS_DIR/${REL%.rej}"
-                mkdir -p "$(dirname "$ORIG_DEST")"
-                cp "$ORIG" "$ORIG_DEST"
-              fi
-              echo "$REL" >> "$REJECTS_DIR/index.txt"
-            done
-          fi
+          set -euo pipefail
 
-      - name: Upload Rejects
-        if: ${{ always() && env.REJ_COUNT > 0 }}
+          cd "$GITHUB_WORKSPACE"
+          rm -rf rej
+          mkdir -p rej
+
+          found="false"
+          while IFS= read -r -d '' rej_file; do
+            found="true"
+            original_file="${rej_file%.rej}"
+            rej_rel="${rej_file#./}"
+            original_rel="${original_file#./}"
+
+            mkdir -p "rej/$(dirname "$rej_rel")"
+            cp -f "$rej_file" "rej/$rej_rel"
+
+            if [[ -f "$original_file" ]]; then
+              mkdir -p "rej/$(dirname "$original_rel")"
+              cp -f "$original_file" "rej/$original_rel"
+            fi
+          done < <(find . -type f -name '*.rej' -print0)
+
+          echo "found=$found" >> "$GITHUB_OUTPUT"
+
+      - name: Zip collected .rej bundle
+        if: ${{ always() && steps.collect_rej.outputs.found == 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          zip -r "rej-${{ inputs.codename }}-${{ matrix.variant }}.zip" rej
+
+      - name: Upload .rej bundle
+        if: ${{ always() && steps.collect_rej.outputs.found == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.FILE_NAME }}-Rejects
-          path: patch-rejects/
-          if-no-files-found: ignore
-          compression-level: 9
+          name: rej-${{ inputs.codename }}-${{ matrix.variant }}
+          path: |
+            rej-${{ inputs.codename }}-${{ matrix.variant }}.zip
