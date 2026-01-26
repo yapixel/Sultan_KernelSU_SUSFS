@@ -72,7 +72,7 @@ jobs:
           git clone https://github.com/TheWildJames/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
           git clone https://github.com/TheWildJames/kernel_patches.git
           #git clone https://github.com/kerneltoast/${{ inputs.repo }}
-          git clone --depth 1 --single-branch https://github.com/kerneltoast/${{ inputs.repo }}
+          git clone https://github.com/kerneltoast/android_kernel_google_tensynos
           if [ "${{ matrix.variant }}" != "WKSU" ]; then
             SUSFS_BRANCH="gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}"
             echo "Using branch for SUSFS: $SUSFS_BRANCH"
