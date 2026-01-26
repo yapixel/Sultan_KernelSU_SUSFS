@@ -25,8 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: ["WKSU-SUSFS", "SHEDOWE"]
-        #"WKSU"
+        variant: ["WKSU-SUSFS"]
     steps:
       #- name: Maximize Build Space
       #  uses: AdityaGarg8/remove-unwanted-software@v5
@@ -172,7 +171,6 @@ jobs:
           echo "CONFIG_IP_SET_LIST_SET=y" >> ./arch/arm64/configs/${{ inputs.codename }}_defconfig
 
       - name: Minimal Droidspaces Support
-        if: ${{ matrix.variant == 'SHEDOWE' }}
         run: |
           cd "$CONFIG"
           # Minimal Droidspaces Support
