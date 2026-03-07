@@ -95,9 +95,17 @@ jobs:
           cp ../susfs4ksu/kernel_patches/fs/* ./fs/
           cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
           patch -p1 --forward < 50_add_susfs_in_gki-${{ inputs.android_version }}-${{ inputs.kernel_version }}.patch || true
-          
+
+          cd ./KernelSU
+          echo "Apply KSU integration patches"   
+          cp ../../susfs4ksu/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ./
+          patch -p1 --fuzz=3 < 10_enable_susfs_for_ksu.patch
+         
+          # Change to common directory and apply SUSFS patch
+          cd ../
           cp ../kernel_patches/sultan/sys.c_fix.patch ./
           patch -p1 --fuzz=3 < sys.c_fix.patch
+          
 
 
       - name: Getting KernelSU Version
