@@ -57,7 +57,7 @@ jobs:
     if: ${{ inputs.make_release || inputs.dry_run }}
     with:
       codename: "zuma"
-      repo: "android_kernel_google_zuma"
+      repo: "android_kernel_google_tensynos"
       android_version: "android14"
       kernel_version: "6.1"
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
@@ -69,7 +69,7 @@ jobs:
     if: ${{ inputs.make_release || inputs.dry_run }}
     with:
       codename: "zuma"
-      repo: "android_kernel_google_zuma"
+      repo: "android_kernel_google_tensynos"
       android_version: "android14"
       kernel_version: "6.1"
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
