@@ -58,7 +58,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          LATEST_SULTAN_TAG=$(gh api repos/kerneltoast/android_kernel_google_zuma/tags --jq '.[0].name')
+          LATEST_SULTAN_TAG=$(gh api repos/kerneltoast/android_kernel_google_tensynos/tags --jq '.[0].name')
           if [ -z "$LATEST_SULTAN_TAG" ]; then
             echo "Error: Could not fetch latest Sultan tag"
             exit 1
