@@ -91,7 +91,7 @@ jobs:
     needs:
       - generate-tag
       - build-kernel-zuma-ksu
-      - build-kernel-zuma-mksu
+      - build-kernel-zuma-kowsu
       - build-kernel-zuma-resukisu
       
     if: ${{ inputs.make_release && !inputs.dry_run }}
