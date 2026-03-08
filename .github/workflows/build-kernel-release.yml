@@ -62,8 +62,8 @@ jobs:
       kernel_version: "6.1"
       release_tag: ${{ needs.generate-tag.outputs.new_tag }}
       
-  build-kernel-zuma-mksu:
-    uses: ./.github/workflows/sultan_mksu.yml
+  build-kernel-zuma-kowsu:
+    uses: ./.github/workflows/sultan_kowsu.yml
     secrets: inherit
     needs: generate-tag
     if: ${{ inputs.make_release || inputs.dry_run }}
